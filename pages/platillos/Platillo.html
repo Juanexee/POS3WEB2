@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Restaurante - Platillos</title>
+    <link rel="stylesheet" href="../../shared/styles/style.css">
+</head>
+<body>
+    <aside>
+        <div class="perfil">
+            <img src="../../shared/images/USER1.png" alt="Usuario">
+            <p>user1</p>
+        </div>
+        <nav>
+           <ul>
+                <li><a href="../../pages/admin/inicio.html">🏠Inicio</a></li>
+                <li><a href="../../pages/categorias/Categoria.html" >📁 Categorías</a></li>
+                <li><a href="../../pages/platillos/Platillo.html" class="active">🍔 Platillos</a></li>
+                <li><a href="../../pages/mesas/Mesas.html">🪑 Mesas</a></li>
+                <li><a href="../../pages/personal/Personal.html">👥 Personal</a></li>
+                <li><a href="../../pages/cocina/Cocina.html" >🍳 Cocina</a></li>
+                <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <section id="modulo-platillos">
+            <header>
+                <h1>Lista de Platillos</h1>
+                <div class="herramientas">
+                    <button id="btn-agregar-platillo" class="btn-primary" title="Agregar Platillo" formaction="../../shared/modals/modalPlatillo.html">+</button>
+                    <div class="contenedor-buscar">
+                        <div class="input-busqueda">
+                            <span>🔍</span>
+                            <input type="text" id="input-buscar-platillo" placeholder="Buscar...">
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <table id="tabla-platillos">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla-platillos">
+                    <tr>
+                        <td>1</td>
+                        <td>Orden de 6 alitas</td>
+                        <td>200.00</td>
+                        <td>Alitas</td>
+                        <td>
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-delete">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Burrito de pollo</td>
+                        <td>150.00</td>
+                        <td>Burritos</td>
+                        <td>
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-delete">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Hamburguesa Clásica</td>
+                        <td>180.00</td>
+                        <td>Hamburguesas</td>
+                        <td>
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-delete">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Papas Fritas Grandes</td>
+                        <td>85.00</td>
+                        <td>Complementos</td>
+                        <td>
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-delete">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Tacos de Res (3)</td>
+                        <td>140.00</td>
+                        <td>Antojitos</td>
+                        <td>
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-delete">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Pizza Pepperoni Personal</td>
+                        <td>195.00</td>
+                        <td>Pizzas</td>
+                        <td>
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-delete">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Ensalada César</td>
+                        <td>120.00</td>
+                        <td>Ensaladas</td>
+                        <td>
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-delete">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Nachos con Queso</td>
+                        <td>110.00</td>
+                        <td>Entradas</td>
+                        <td>
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-delete">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>Club Sandwich</td>
+                        <td>165.00</td>
+                        <td>Sandwiches</td>
+                        <td>
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-delete">🗑️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Limonada con Hierbabuena</td>
+                        <td>45.00</td>
+                        <td>Bebidas</td>
+                        <td>
+                            <button class="btn-edit">✏️</button>
+                            <button class="btn-delete">🗑️</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="paginacion">
+                <button id="btn-prev">Anterior</button>
+                <span id="info-pagina">Página 1 de 2</span>
+                <button id="btn-next">Siguiente</button>
+            </div>
+        </section>
+
+        <div id="modal-platillo" class="modal-overlay" style="display: flex;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <div class="logo-circular">
+                        <img src="logo-restaurante.png" alt="Restaurante">
+                    </div>
+                    <h3>Detalle del Platillo</h3>
+                </header>
+
+                <form id="form-platillo">
+                    <div class="fila-formulario">
+                        <div class="campo">
+                            <label for="nombre-platillo">Nombre</label>
+                            <input type="text" id="nombre-platillo" name="nombre" placeholder="Nombre del platillo" required>
+                        </div>
+                        <div class="campo">
+                            <label for="precio-platillo">Precio</label>
+                            <input type="number" id="precio-platillo" name="precio" step="0.01" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <div class="fila-formulario">
+                        <div class="campo">
+                            <label for="Descripcion-platillo">Descripción</label>
+                            <input type="text" id="Descripcion-platillo" name="descripcion" placeholder="Ej: Deliciosas alitas con salsa BBQ..." required>
+                        </div>
+                    </div>
+
+                    <div class="fila-formulario">
+                        <div class="campo">
+                            <label for="categoria-platillo">Categoría</label>
+                            <select id="categoria-platillo" name="categoria" required>
+                                <option value="">Seleccione...</option>
+                                <option value="1">Alitas</option>
+                                <option value="2">Burritos</option>
+                                <option value="3">Bebidas</option>
+                            </select>
+                        </div>
+                        <div class="campo-foto" style="display: flex; align-items: flex-end; padding-bottom: 15px;">
+                            <label class="upload-box" for="subir-imagen" style="width: 100%; height: 50px; flex-direction: row; gap: 10px;">
+                                <div class="icon-box">📦</div>
+                                <span>Subir Foto</span>
+                                <input type="file" id="subir-imagen" name="imagen" accept="image/*" hidden>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="botones-acciones">
+                        <button type="button" class="btn-salir">Cancelar</button>
+                        <button type="submit" class="btn-guardar">guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/platillos.js"></script>
+</body>
+</html>

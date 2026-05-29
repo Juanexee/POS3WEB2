@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal</title>
+    <link rel="stylesheet" href="../../shared/styles/personal.css">
+</head>
+
+<body>
+
+    <!-- 🔴 MENÚ LATERAL -->
+    <aside>
+        <div class="perfil">
+            <img src="../../shared/images/USER1.png" alt="Usuario">
+            <p>user1</p>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../../pages/admin/inicio.html">🏠Inicio</a></li>
+                <li><a href="../../pages/categorias/Categoria.html" >📁 Categorías</a></li>
+                <li><a href="../../pages/platillos/Platillo.html" >🍔 Platillos</a></li>
+                <li><a href="../../pages/mesas/Mesas.html">🪑 Mesas</a></li>
+                <li><a href="../../pages/personal/Personal.html" class="active">👥 Personal</a></li>
+                <li><a href="../../pages/cocina/Cocina.html" >🍳 Cocina</a></li>
+                <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
+            </ul>
+    
+        </nav>
+    </aside>
+
+    <!-- 🟢 CONTENIDO -->
+    <main>
+
+        <header>
+            <h1>Lista de Personal</h1>
+        </header>
+
+        <!-- HERRAMIENTAS -->
+        <div class="herramientas">
+            <button class="btn-primary" title="Agregar Personal" formaction="../../shared/modals/modalPersonal.html">+</button>
+
+            <div class="input-busqueda">
+                🔍 <input type="text" placeholder="Buscar...">
+            </div>
+        </div>
+
+        <!-- TABLA -->
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+<tbody>
+    <tr>
+        <td>1</td>
+        <td>Mario Estrada</td>
+        <td>8366-5851</td>
+        <td>Mesero</td>
+        <td>
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete">🗑️</button>
+        </td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Juan Pérez</td>
+        <td>8888-8888</td>
+        <td>Chef </td>
+        <td>
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete">🗑️</button>
+        </td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Ana Rodríguez</td>
+        <td>7755-4433</td>
+        <td>Administradora</td>
+        <td>
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete">🗑️</button>
+        </td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>Carlos Villa</td>
+        <td>8211-9900</td>
+        <td>Cocinero A</td>
+        <td>
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete">🗑️</button>
+        </td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>Lucía Méndez</td>
+        <td>5844-3210</td>
+        <td>Cajera</td>
+        <td>
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete">🗑️</button>
+        </td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td>Roberto Gómez</td>
+        <td>8622-7711</td>
+        <td>Mesero</td>
+        <td>
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete">🗑️</button>
+        </td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td>Elena Torres</td>
+        <td>7500-1122</td>
+        <td>Bartender</td>
+        <td>
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete">🗑️</button>
+        </td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td>Miguel Sánchez</td>
+        <td>8933-4455</td>
+        <td>Auxiliar de Cocina</td>
+        <td>
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete">🗑️</button>
+        </td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>Sofía López</td>
+        <td>5711-8899</td>
+        <td>Mesero</td>
+        <td>
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete">🗑️</button>
+        </td>
+    </tr>
+    <tr>
+        <td>10</td>
+        <td>David Ruiz</td>
+        <td>8400-5566</td>
+        <td>Mantenimiento</td>
+        <td>
+            <button class="btn-edit">✏️</button>
+            <button class="btn-delete">🗑️</button>
+        </td>
+    </tr>
+</tbody>
+        </table>
+
+        <div class="paginacion">
+                <button id="btn-prev">Anterior</button>
+                <span id="info-pagina">Página 1 de 2</span>
+                <button id="btn-next">Siguiente</button>
+            </div>
+
+    </main>
+
+    <div class="modal-overlay" id="modal-agregar-personal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>👥 Registrar Nuevo Personal</h2>
+           
+        </div>
+        <div class="modal-body">
+            <form id="form-agregar-personal">
+                <div class="campo">
+                    <label>Nombre Completo:</label>
+                    <input type="text" id="per-nombre" placeholder="Ej: Juan Pérez" required>
+                </div>
+
+                <div class="campo">
+                    <label>Teléfono:</label>
+                    <input type="text" id="per-telefono" placeholder="Ej: 8888-8888">
+                </div>
+
+                <div class="campo">
+                    <label>Nombre de Usuario (Login):</label>
+                    <input type="text" id="per-usuario" placeholder="Ej: juan.admin" required>
+                </div>
+
+                <div class="campo">
+                    <label>Contraseña:</label>
+                    <input type="password" id="per-pass" placeholder="********" required>
+                </div>
+
+                <div class="campo">
+                    <label>Asignar Rol:</label>
+                    <select id="per-rol" class="input-moderno" required>
+                        <option value="">-- Seleccione un Rol --</option>
+                        <option value="1">Administrador (ID 1)</option>
+                        <option value="2">Cajero (ID 2)</option>
+                        <option value="3">Mesero (ID 3)</option>
+                        <option value="6">Usuario Escritor (ID 6)</option>
+                    </select>
+                </div>
+
+                <div class="botones-acciones">
+                    <button type="button" class="btn-salir" >Cancelar</button>
+                    <button type="submit" class="btn-guardar">Guardar Personal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

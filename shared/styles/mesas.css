@@ -1,0 +1,156 @@
+/* ============================================================
+   MÓDULO DE MESAS - VISTA EN MAPA / GRID
+   ============================================================ */
+.grid-mesas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+}
+
+.mesa {
+    background: white; 
+    border-radius: 20px; 
+    padding: 25px; 
+    text-align: center;
+    border: 2px solid transparent; 
+    transition: all 0.3s ease;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 10px;
+    cursor: pointer;
+    position: relative;
+}
+
+.mesa:hover {
+    transform: translateY(-3px);
+}
+
+.numero-mesa { font-size: 3rem; font-weight: 800; line-height: 1; }
+.nombre-mesa { font-weight: bold; color: #0e0e0e; }
+.tag-estado { padding: 5px 15px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; border: 1px solid; }
+
+/* Estados de las Mesas */
+.mesa.disponible { border-color: #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.15); }
+.mesa.disponible .numero-mesa { color: #2ecc71; }
+.mesa.disponible .tag-estado { color: #2ecc71; border-color: #2ecc71; }
+
+.mesa.ocupada { border-color: #e67e22; box-shadow: 0 0 20px rgba(230, 126, 34, 0.15); }
+.mesa.ocupada .numero-mesa { color: #e67e22; }
+.mesa.ocupada .tag-estado { color: #e67e22; border-color: #e67e22; }
+
+/* Info de Sesión Activa */
+.info-sesion { width: 100%; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e67e22; }
+.tiempo-alerta { color: #dc3545 !important; animation: pulse-alert 2s infinite; }
+
+@keyframes pulse-alert { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+/* Botón Circular Superior de Agregar (+) sin romper los del modal */
+.btn-agregar-top {
+    background-color: #0e0e0e; 
+    color: white; 
+    border: none; 
+    width: 45px; 
+    height: 45px; 
+    border-radius: 50%; 
+    font-size: 24px; 
+    cursor: pointer;
+}
+
+/* ============================================================
+   ESTÁNDAR UNIFICADO PARA MODALES (Basado en Platillos)
+   ============================================================ */
+
+/* Encabezados internos de los modales */
+.modal-header-estandar {
+    background-color: #ff6b00;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px 10px 20px;
+    border-bottom: 1px solid #edf2f7;
+}
+
+
+
+
+/* Forzar que los inputs de texto/número y select de mesas se vean estilizados como platillos */
+.modal-overlay input[type="text"],
+.modal-overlay input[type="number"],
+.modal-overlay select {
+    background-color: #f8f9fa;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #2d3748;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modal-overlay input:focus,
+.modal-overlay select:focus {
+    border-color: #ff6b00; /* Mantiene la identidad de marca naranja */
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15);
+}
+
+/* Elementos de pedidos internos en el modal de KDS */
+.seccion-kds-modal h4 {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.seccion-kds-modal ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.seccion-kds-modal li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Acciones rápidas (Hover en las tarjetas) */
+.acciones-mesa-card {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.mesa:hover .acciones-mesa-card {
+    opacity: 1;
+}
+
+.btn-editar-rapido, .btn-eliminar-rapido {
+    background: #f1f2f6;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 5px 7px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-editar-rapido:hover { background: #ffeaa7; border-color: #f1c40f; transform: scale(1.1); }
+.btn-eliminar-rapido:hover { background: #ffcbd1; border-color: #e74c3c; transform: scale(1.1); }

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MESAS - Rancho de la Mimi</title>
+    <link rel="stylesheet" href="../../shared/styles/shared.css">
+    <link rel="stylesheet" href="../../shared/styles/mesas.css">
+</head>
+
+<body>
+    <aside>
+        <div class="perfil">
+            <img src="../../shared/images/USER1.png" alt="Usuario">
+            <p>user1</p>
+        </div>
+        <nav>
+           <ul>
+                <li><a href="../../pages/admin/inicio.html">🏠Inicio</a></li>
+                <li><a href="../../pages/categorias/Categoria.html">📁 Categorías</a></li>
+                <li><a href="../../pages/platillos/Platillo.html">🍔 Platillos</a></li>
+                <li><a href="../../pages/mesas/Mesas.html" class="active">🪑 Mesas</a></li>
+                <li><a href="../../pages/personal/Personal.html">👥 Personal</a></li>
+                <li><a href="../../pages/cocina/Cocina.html">🍳 Cocina</a></li>
+                <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <section id="modulo-mesas">
+            <header>
+                <h1>Mapa de Mesas</h1>
+                <div class="herramientas">
+                    <button id="btn-abrir-agregar" class="btn-agregar-top" title="Agregar Mesa">+</button>
+                    <div class="contenedor-buscar">                        
+                       <div class="input-busqueda">
+                            <span>🔍</span>
+                            <input type="text" id="input-buscar-mesa" placeholder="Buscar mesa...">
+                       </div>
+                    </div>
+                </div>
+            </header>
+
+            <div id="contenedor-plano-mesas" class="grid-mesas">
+                <div class="mesa disponible" data-mesa-id="1">  
+                    <div class="numero-mesa">1</div> 
+                    <div class="nombre-mesa">Mesa 1</div>
+                    <div class="tag-estado">LIBRE</div>
+                    <p class="mensaje-estado">LISTA PARA SERVICIO</p>
+                </div>
+
+                <div class="mesa ocupada" data-mesa-id="2" data-sesion-id="105">
+                    <div class="numero-mesa">2</div> 
+                    <div class="nombre-mesa">Mesa 2</div>
+                    <div class="tag-estado">OCUPADA</div>
+                    <div class="info-sesion">
+                        <div class="detalle-info">
+                            <span class="label">Tiempo:</span>
+                            <span class="valor tiempo-alerta">32 min</span>
+                        </div>
+                        <div class="detalle-info">
+                            <span class="label">Consumo:</span>
+                            <span class="valor">C$ 450.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="modal-overlay" id="modal-detalle-mesa" style="display: none;">
+            <div class="modal-content">
+                <header class="modal-header-estandar">
+                    <h3 id="detalle-titulo-mesa">🪑 Mesa X</h3>
+                    <span id="detalle-badge-estado" class="tag-estado">OCUPADA</span>
+                </header>
+                
+                <div class="modal-body">
+                    <div class="seccion-kds-modal" style="margin-bottom: 20px;">
+                        <h4>✅ listo para servir <span id="cant-ready">0</span></h4>
+                        <ul id="lista-pedidos-ready"></ul>
+                    </div>
+
+                    <div class="seccion-kds-modal">
+                        <h4>⏳ todavia en la cocina <span id="cant-kitchen">0</span></h4>
+                        <ul id="lista-pedidos-kitchen"></ul>
+                    </div>
+
+                    <div class="botones-acciones">
+                        <button type="button" class="btn-salir" id="btn-cerrar-detalle">Volver</button>
+                        <button type="button" class="btn-edit" id="btn-abrir-cambio">Cambiar Mesa</button>
+                        <button type="button" class="btn-guardar" id="btn-confirmar-entrega">Entrega</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-cambio-mesa" style="display: none;">
+            <div class="modal-content">
+                <header class="modal-header-estandar">
+                    <h3>🔄 Cambiar de Mesa</h3>
+                </header>
+                <div class="modal-body">
+                    <form id="form-cambio-mesa">
+                        <div class="fila-formulario">
+                            <div class="campo">
+                                <label>Mesa Actual:</label>
+                                <input type="text" id="cambio-mesa-origen" value="Mesa 2" disabled>
+                            </div>
+                        </div>
+                        <div class="fila-formulario">
+                            <div class="campo">
+                                <label>Seleccionar Mesa Destino:</label>
+                                <select id="mesa-destino-id" required>
+                                    <option value="">-- Seleccione una mesa libre --</option>
+                                    <option value="1">Mesa 1 (Libre)</option>
+                                    <option value="3">Mesa 3 (Libre)</option>
+                                    <option value="4">Mesa 4 (Libre)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="botones-acciones">
+                            <button type="button" class="btn-salir" id="btn-cancelar-cambio">Cancelar</button>
+                            <button type="submit" class="btn-guardar">Confirmar Cambio</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-agregar-mesa" style="display: none;">
+            <div class="modal-content">
+                <header class="modal-header-estandar">
+                    <h3 id="modal-titulo-mesa">Registrar Nueva Mesa</h3>
+                </header>
+                
+                <div class="modal-body">
+                    <form id="form-agregar-mesa">
+                        <input type="hidden" id="nuevo-id-mesa" value="">
+
+                        <div class="fila-formulario">
+                            <div class="campo">
+                                <label for="nuevo-num-mesa">Número de Mesa</label>
+                                <input type="number" id="nuevo-num-mesa" required min="1">
+                            </div>
+                            <div class="campo">
+                                <label for="nuevo-cap-mesa">Capacidad</label>
+                                <input type="number" id="nuevo-cap-mesa" required min="1">
+                            </div>
+                        </div>
+
+                        <div class="fila-formulario">
+                            <div class="campo">
+                                <label for="nuevo-ubicacion-mesa">Ubicación / Área</label>
+                                <select id="nuevo-ubicacion-mesa" required>
+                                    <option value="">-- Seleccione Área --</option>
+                                    <option value="Salón Principal">Salón Principal</option>
+                                    <option value="Terraza">Terraza</option>
+                                    <option value="VIP">VIP</option>
+                                    <option value="Barra">Barra</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="botones-acciones">
+                            <button type="button" id="btn-cancelar-agregar" class="btn-salir">Cancelar</button>
+                            <button type="submit" id="btn-guardar-mesa" class="btn-guardar">Guardar Mesa</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="./mesas.js"></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+/* ============================================================
+   MÓDULO DE FACTURACIÓN - EL RANCHO DE LA MIMI (Mobile-First)
+   ============================================================ */
+
+:root {
+    --bg-tarjeta: #1A1A1A;
+    --naranja-primario: #FF6B00;
+    --naranja-suave: #FF8933;
+    --marrón-detalle: #814915;
+    --blanco: #ffffff;
+    --gris-fondo: #f9fafb;
+    --azul-paid: #1e3a8a;
+    --verde-complete: #2ecc71;
+}
+
+/* --- DISEÑO ENFOQUE MÓVIL --- */
+
+/* Ocultar la tabla clásica en pantallas de celulares */
+.invoice-table-container {
+    display: none;
+}
+
+/* Grid vertical de tarjetas táctiles para móviles */
+.invoice-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.invoice-card {
+    background: var(--bg-tarjeta);
+    color: var(--blanco);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+    border-left: 6px solid #ccc; /* Estado genérico */
+}
+
+/* Indicadores de barras laterales por estados */
+.invoice-card.status-paid { border-left-color: var(--azul-paid); }
+.invoice-card.status-complete { border-left-color: var(--verde-complete); }
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.invoice-number {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--naranja-suave);
+}
+
+/* Badges de estados uniformes */
+.badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--blanco);
+}
+
+.invoice-card.status-paid .status-badge, .row-paid .status-badge { background-color: var(--azul-paid); }
+.invoice-card.status-complete .status-badge, .row-complete .status-badge { background-color: var(--verde-complete); }
+
+.card-body p {
+    font-size: 0.9rem;
+    margin: 5px 0;
+    color: #ccc;
+}
+
+.invoice-total {
+    font-size: 1.1rem !important;
+    font-weight: bold;
+    color: var(--naranja-primario) !important;
+    margin-top: 8px !important;
+}
+
+/* Botones de acción rápidos para el pulgar */
+.card-actions, .table-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: flex-end;
+}
+
+.btn-action {
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    color: var(--blanco);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+.btn-view { background-color: #4b5563; }
+.btn-print { background-color:#0e0e0e; }
+.btn-delete { background-color: #dc3545; }
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+
+/* ============================================================
+   DISEÑO EN DESKTOP / ESCRITORIO (min-width: 768px)
+   ============================================================ */
+@media (min-width: 768px) {
+    /* Ocultamos las tarjetas móviles */
+    .invoice-cards-container {
+        display: none;
+    }
+
+    /* Activamos la tabla clásica amplia */
+    .invoice-table-container {
+        display: block;
+        background: var(--blanco);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-top: 20px;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .invoice-table th {
+        background-color: var(--bg-tarjeta);
+        color: var(--blanco);
+        padding: 16px;
+        font-weight: 600;
+        border-bottom: 2px solid var(--marrón-detalle);
+    }
+
+    .invoice-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #eee;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    /* Colores sutiles para los renglones según el estado */
+    .row-paid { background-color: rgba(30, 58, 170, 0.03); }
+    .row-complete { background-color: rgba(46, 204, 113, 0.03); }
+    
+    .invoice-table tbody tr:hover {
+        background-color: #f3f4f6;
+    }
+
+    .text-bold {
+        font-weight: bold;
+        color: var(--naranja-primario);
+    }
+
+    .table-actions {
+        margin-top: 0;
+    }
+}
+
+/* ============================================================
+   ESTRUCTURA DEL CUERPO DEL FORMULARIO (MODAL BODY)
+   ============================================================ */
+.modal-body {
+    padding: 25px 30px;              /* Unificamos márgenes internos perfectos */
+    display: flex;
+    flex-direction: column;          /* Organiza las filas verticalmente */
+    gap: 18px;                       /* Separación idéntica y limpia entre cada fila */
+}
+
+/* Forzamos a que cada grupo de inputs se comporte como una fila flexible */
+.modal-body form, 
+#form-factura-transaccion {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+}
+
+/* --- FILAS DE DOS COLUMNAS (Mesa/Mesero y Pago/Cambio) --- */
+.fila-formulario {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;                       /* Espacio horizontal exacto entre los dos campos */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Cada campo individual (Label + Input) toma el 50% de la fila */
+.fila-formulario .campo,
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;                         /* Hace que ambos midan exactamente lo mismo */
+    width: 50%;
+    box-sizing: border-box;
+}
+
+/* Excepción: El campo del Importe Total ocupa todo el ancho de su fila */
+.modal-body .form-group:not(.fila-formulario .campo) {
+    width: 100%;
+}
+
+/* --- ESTILOS DE LOS INPUTS Y ETIQUETAS --- */
+.form-group label, 
+.fila-formulario .campo label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #444;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.form-group input, 
+.fila-formulario .campo input {
+    width: 100% !important;          /* Obliga al input a no salirse de su contenedor de 50% */
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    outline: none;
+    box-sizing: border-box;          /* Evita que el padding sume tamaño extra al ancho */
+    transition: 0.3s;
+}
+
+.form-group input:focus,
+.fila-formulario .campo input:focus {
+    border-color: #0e0e0e;     
+
+    box-shadow: 0 0 8px rgba(255, 107, 0, 0.2);
+}
+
+/* Campos deshabilitados o de lectura */
+.input-disabled, .input-readonly {
+    background-color: var(--gris-fondo);
+    color: #444;
+    font-weight: bold;
+    border-color: #eee !important;
+}
+
+/* Resaltado del Cambio en Naranja de Adobe Color */
+.text-highlight {
+    color: var(--naranja-primario) !important;
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    border: 1px solid rgba(255, 107, 0, 0.4) !important;
+    background-color: #fffaf7 !important;
+}
+
+/* --- PIE DEL MODAL (BOTONES TOTALMENTE AJUSTADOS) --- */
+.modal-footer {
+    background: #ffffff;
+    padding: 15px 30px 25px 30px;    /* Ajuste para eliminar el espacio blanco excesivo */
+    display: flex;
+    justify-content: center;        /* Centra los botones de forma elegante */
+    align-items: center;
+    gap: 15px;
+    border-top: 1px solid #eee;
+}
+
+.mesa {
+    position: relative; /* Para poder posicionar de forma absoluta las acciones dentro */
+    /* ... Tus estilos base ... */
+}
+
+.acciones-mesa-card {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    display: flex;
+    gap: 6px;
+    opacity: 0.3; /* Silenciosos por defecto */
+    transition: opacity 0.2s ease;
+}
+
+.mesa:hover .acciones-mesa-card {
+    opacity: 1; /* Resaltan al pasar el mouse por encima */
+}
+
+.btn-editar-rapido, .btn-eliminar-rapido {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    padding: 4px 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+
+.btn-editar-rapido:hover {
+    background: #ffc107;
+}
+
+.btn-eliminar-rapido:hover {
+    background: #dc3545;
+}
+
+.capacidad-text {
+    font-size: 11px;
+    color: #b3b3b3;
+    margin: 5px 0;
+}
