@@ -139,18 +139,111 @@
     opacity: 1;
 }
 
-.btn-editar-rapido, .btn-eliminar-rapido {
+.btn-editar-rapido, 
+.btn-eliminar-rapido,
+.btn-cambiar-rapido {
     background: #f1f2f6;
     border: 1px solid #ced4da;
     border-radius: 6px;
-    padding: 5px 7px;
+    padding: 5px 7px;          /* Controla el tamaño interno */
+    height: 28px;              /* Fijamos altura para asegurar uniformidad */
+    box-sizing: border-box;
     cursor: pointer;
     font-size: 13px;
-    display: flex;
+    display: inline-flex;      /* Cambiado a inline-flex para mejor alineación si hay texto/icono */
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
 }
+.btn-editar-rapido:hover { 
+    background: #ffeaa7; 
+    border-color: #f1c40f; 
+    transform: scale(1.05); 
+}
 
-.btn-editar-rapido:hover { background: #ffeaa7; border-color: #f1c40f; transform: scale(1.1); }
-.btn-eliminar-rapido:hover { background: #ffcbd1; border-color: #e74c3c; transform: scale(1.1); }
+.btn-eliminar-rapido:hover { 
+    background: #ffcbd1; 
+    border-color: #e74c3c; 
+    transform: scale(1.05); 
+}
+
+/* Hover estilizado para cambiar mesa (Naranja de la marca o azul operativo) */
+.btn-cambiar-rapido:hover { 
+    background: #ffe3d1; 
+    border-color: #ff6b00; 
+    color: #ff6b00;
+    transform: scale(1.05); 
+}
+
+/* ============================================================
+   ESTILOS DE BOTONES EN MODALES (PERFECTAMENTE ALINEADOS Y CENTRADOS)
+   ============================================================ */
+.botones-acciones {
+    display: flex;
+    justify-content: center; /* Centra los botones horizontalmente */
+    align-items: center;
+    gap: 12px; /* Espacio uniforme entre botones */
+    margin-top: 25px;
+    width: 100%;
+}
+
+.botones-acciones button {
+    /* Tamaño uniforme para todos los botones */
+    flex: 0 1 auto; /* No se estiran, mantienen su tamaño natural */
+    min-width: 110px;
+    
+    /* Altura fija para evitar desalineaciones */
+    height: 42px;
+    box-sizing: border-box;
+    
+    /* Espaciado interno y texto */
+    padding: 0 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    
+    /* Centrado perfecto del texto dentro del botón */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
+    
+    /* Elimina cualquier margen o padding fantasma */
+    margin: 0;
+}
+
+/* Variaciones de color para mantener la consistencia */
+.botones-acciones .btn-salir {
+    background-color: #f1f2f6;
+    color: #2d3748;
+    border: 1px solid #e2e8f0;
+}
+
+.botones-acciones .btn-salir:hover {
+    background-color: #e2e8f0;
+}
+
+/* Botón Cambiar Mesa - estandarizado */
+.botones-acciones .btn-cambiar-modal {
+    background-color: #e2e8f0;
+    color: #2d3748;
+    border: 1px solid #cbd5e0;
+}
+
+.botones-acciones .btn-cambiar-modal:hover {
+    background-color: #cbd5e0;
+}
+
+/* Botón Guardar/Entrega - color de marca */
+.botones-acciones .btn-guardar {
+    background-color: #ff6b00;
+    color: white;
+}
+
+.botones-acciones .btn-guardar:hover {
+    background-color: #e55a00;
+}
