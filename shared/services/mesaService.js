@@ -97,3 +97,54 @@ export async function eliminarMesa(id) {
     }
     return true;
 }
+
+/**
+ * Envía una petición para cambiar la sesión activa a una nueva mesa.
+ * @param {number} sesionId ID de la sesión actual
+ * @param {number} nuevaMesaId ID de la mesa destino
+ */
+export async function cambiarMesaService(sesionId, nuevaMesaId) {
+    const endpoint = `${BASE_URL}/api/Sesion/cambiar-mesa`;
+    const token = localStorage.getItem('token_mimi');
+
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ sesionId, nuevaMesaId })
+    });
+
+    const resultado = await response.json();
+    if (!response.ok) {
+        throw new Error(resultado.message || 'Error al intentar cambiar de mesa.');
+    }
+    return resultado;
+}
+
+/**
+ * Registra la entrega o despacho de los platos listos de la mesa.
+ * @param {Array<number>} idsPedidos Lista de IDs de los pedidos a entregar
+ */
+export async function entregarPedidosService(idsPedidos) {
+    const endpoint = `${BASE_URL}/api/Sesion/entregar-pedidos`; 
+    const token = localStorage.getItem('token_mimi');
+
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ idsPedidos }) //  ¡Ahora coincide con ActualizarPedidoRequest!
+    });
+
+    const resultado = await response.json();
+
+    if (!response.ok) {
+        // Capturamos el mensaje de tu regla de negocio (ej: "Denegado: No puedes entregar...")
+        throw new Error(resultado.message || 'No se pudo registrar la entrega de los pedidos.');
+    }
+    return resultado;
+}

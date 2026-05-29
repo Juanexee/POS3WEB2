@@ -1,4 +1,11 @@
-import { obtenerMesas, insertarMesa, actualizarMesa, eliminarMesa } from '../../shared/services/mesaService.js';
+import { 
+    obtenerMesas, 
+    insertarMesa, 
+    actualizarMesa, 
+    eliminarMesa, 
+    cambiarMesaService, 
+    entregarPedidosService 
+} from '../../shared/services/mesaService.js';
 
 // VARIABLES GLOBALES
 let contenedorGrid;
@@ -6,7 +13,12 @@ let modalAgregar;
 let formAgregarMesa;
 let modalTitulo;
 
-// EN LUGAR DE ESPERAR EL DOMContentLoaded, EJECUTAMOS DIRECTAMENTE
+// Nuevas variables para la gestión de pedidos y estados de sesión
+let modalDetalle;
+let modalCambioMesa;
+let mesaSeleccionadaActual = null; // Guardará el objeto completo de la mesa abierta
+let listaCompletaMesas = []; // Caché local para filtrar destinos del select
+
 inicializarModuloMesas();
 
 async function inicializarModuloMesas() {
@@ -15,21 +27,154 @@ async function inicializarModuloMesas() {
     formAgregarMesa = document.getElementById('form-agregar-mesa');
     modalTitulo = document.getElementById('modal-titulo-mesa');
     
+    // Modales de operación
+    modalDetalle = document.getElementById('modal-detalle-mesa');
+    modalCambioMesa = document.getElementById('modal-cambio-mesa');
+
+    // Botones de control del Modal Detalle
+    const btnCerrarDetalle = document.getElementById('btn-cerrar-detalle');
+    const btnAbrirCambio = document.getElementById('btn-abrir-cambio');
+    const btnConfirmarEntrega = document.getElementById('btn-confirmar-entrega');
+
+    // Botones de control del Modal Cambio de Mesa
+    const btnCancelarCambio = document.getElementById('btn-cancelar-cambio');
+    const formCambioMesa = document.getElementById('form-cambio-mesa');
+
     const btnAbrirAgregar = document.getElementById('btn-abrir-agregar');
-    
-    // Buscamos TODOS los botones que tengan esta clase o ID para cerrar el modal de agregar
     const btnCancelarAgregar = document.getElementById('btn-cancelar-agregar');
 
     if (!contenedorGrid) return;
 
-    // Abrir para NUEVA MESA (Limpio)
+    // ==========================================
+    // ACCIONES: MODAL DETALLE & MODAL CAMBIO
+    // ==========================================
+
+    // 1. Botón "Volver" (Salir del detalle)
+    if (btnCerrarDetalle) {
+        btnCerrarDetalle.addEventListener('click', () => {
+            modalDetalle.style.display = 'none';
+            mesaSeleccionadaActual = null;
+        });
+    }
+
+    // 2. Botón "Cambiar Mesa" (Abre sub-modal)
+    if (btnAbrirCambio) {
+        btnAbrirCambio.addEventListener('click', () => {
+            if (!mesaSeleccionadaActual) return;
+
+            // Configurar input origen
+            document.getElementById('cambio-mesa-origen').value = `Mesa ${mesaSeleccionadaActual.numeroMesa}`;
+            
+            // Llenar select dinámicamente con las mesas verdaderamente LIBRES de la DB
+            const selectDestino = document.getElementById('mesa-destino-id');
+            selectDestino.innerHTML = '<option value="">-- Seleccione una mesa libre --</option>';
+            
+            // FILTRO ESTRICTO: Solo mesas en estado 'disponible' y que NO tengan sesiones fantasma vinculadas
+            const mesasLibres = listaCompletaMesas.filter(m => 
+                (m.estado ? m.estado.toLowerCase() : '') === 'disponible' && 
+                (m.sesionID === null || m.sesionId === null || m.SesionID === undefined) &&
+                (m.id || m.mesaID) !== (mesaSeleccionadaActual.id || mesaSeleccionadaActual.mesaID)
+            );
+
+            mesasLibres.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.mesaID || m.id; 
+                opt.textContent = `Mesa ${m.numeroMesa} (${m.ubicacion || 'Sin Área'})`;
+                selectDestino.appendChild(opt);
+            });
+
+            modalCambioMesa.style.display = 'flex';
+        });
+    }
+
+    // 3. Cancelar sub-modal de Cambio de Mesa
+    if (btnCancelarCambio) {
+        btnCancelarCambio.addEventListener('click', () => {
+            modalCambioMesa.style.display = 'none';
+            document.getElementById('form-cambio-mesa').reset();
+        });
+    }
+
+    // 4. Formulario Submit: Confirmar Cambio de Mesa
+    if (formCambioMesa) {
+        formCambioMesa.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nuevaMesaId = parseInt(document.getElementById('mesa-destino-id').value);
+            
+            if (!nuevaMesaId) {
+                alert('⚠️ Por favor, seleccione una mesa de destino.');
+                return;
+            }
+
+            // EXTRAER Y VALIDAR SESION ID AQUÍ (Cuando ya existe contexto de mesaSeleccionadaActual)
+            let sesionId = mesaSeleccionadaActual.sesionID || 
+                           mesaSeleccionadaActual.sesionId || 
+                           mesaSeleccionadaActual.SesionID; 
+
+            // Manejo de plan B para tus pruebas con mesas que no tengan sesión en BD
+            if (!sesionId) {
+                sesionId = 105; // ID numérico por defecto para testing
+            } else {
+                sesionId = parseInt(sesionId); // Forzar conversión limpia a Int32 puro
+            }
+
+            try {
+                await cambiarMesaService(sesionId, nuevaMesaId);
+                alert('¡Mesa cambiada exitosamente!');
+                
+                modalCambioMesa.style.display = 'none';
+                modalDetalle.style.display = 'none';
+                formCambioMesa.reset();
+                
+                await cargarMapaMesas(contenedorGrid);
+            } catch (error) {
+                alert(`⚠️ No se pudo realizar el cambio: ${error.message}`);
+            }
+        });
+    }
+
+   // 5. Botón "Entrega" (Despachar platos listos de la mesa)
+if (btnConfirmarEntrega) {
+    btnConfirmarEntrega.addEventListener('click', async () => {
+        if (!mesaSeleccionadaActual) return;
+        
+        try {
+            const cantReady = parseInt(document.getElementById('cant-ready').innerText) || 0;
+            if (cantReady === 0) {
+                alert('No hay órdenes marcadas como "listas para servir" en esta mesa.');
+                return;
+            }
+
+            // =========================================================================
+            // PLAN DE PRUEBA: IDs de pedidos ficticios para simular el lote de la base de datos
+            // Reemplaza estos números por IDs reales de tu tabla [Pedidos] que estén en estado 'Listo'
+            // =========================================================================
+            const idsPedidosAEntregar = [1001, 1002]; 
+
+            // Invocamos al servicio corregido pasando el Array
+            const respuesta = await entregarPedidosService(idsPedidosAEntregar);
+            
+            alert(`✅ ${respuesta.message}`); // Muestra el mensaje de éxito de tu capa de negocio
+            modalDetalle.style.display = 'none';
+            await cargarMapaMesas(contenedorGrid);
+
+        } catch (error) {
+            // Ahora este catch atrapará correctamente si la API te dice "Denegado..." debido a tus estados en BD
+            alert(`⚠️ Error en entrega: ${error.message}`);
+        }
+    });
+}
+
+    // ==========================================
+    // COMPORTAMIENTO CONFIGURACIÓN GENERAL MESAS
+    // ==========================================
     if (btnAbrirAgregar) {
         btnAbrirAgregar.addEventListener('click', (e) => {
-            e.preventDefault(); // Evitamos cualquier comportamiento extraño
+            e.preventDefault();
             modalTitulo.innerText = "Registrar Nueva Mesa";
-            document.getElementById('nuevo-id-mesa').value = ""; // ID vacío = INSERT
+            document.getElementById('nuevo-id-mesa').value = ""; 
             formAgregarMesa.reset();
-            modalAgregar.style.display = 'flex'; // Cambiado a flex para centrar el modal
+            modalAgregar.style.display = 'flex';
         });
     }
 
@@ -41,11 +186,9 @@ async function inicializarModuloMesas() {
         });
     }
 
-    // El resto de tus manejadores de Submit y CargarMapa se quedan igual...
     if (formAgregarMesa) {
         formAgregarMesa.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const idMesa = document.getElementById('nuevo-id-mesa').value;
             const numeroMesa = parseInt(document.getElementById('nuevo-num-mesa').value);
             const capacidad = parseInt(document.getElementById('nuevo-cap-mesa').value);
@@ -61,10 +204,9 @@ async function inicializarModuloMesas() {
                     await insertarMesa(payload);
                     alert('¡Mesa registrada correctamente!');
                 }
-
                 modalAgregar.style.display = 'none';
                 formAgregarMesa.reset();
-                cargarMapaMesas(contenedorGrid); 
+                await cargarMapaMesas(contenedorGrid); 
             } catch (error) {
                 alert(error.message);
             }
@@ -77,16 +219,16 @@ async function inicializarModuloMesas() {
 async function cargarMapaMesas(contenedorGrid) {
     try {
         contenedorGrid.innerHTML = '<p style="padding: 20px;">Cargando mesas del salón...</p>';
-        const listaMesas = await obtenerMesas();
+        listaCompletaMesas = await obtenerMesas(); // Guardamos en la caché global
 
-        if (listaMesas.length === 0) {
+        if (listaCompletaMesas.length === 0) {
             contenedorGrid.innerHTML = '<p style="padding: 20px;">No hay mesas registradas.</p>';
             return;
         }
 
         contenedorGrid.innerHTML = '';
 
-        listaMesas.forEach(mesa => {
+        listaCompletaMesas.forEach(mesa => {
             const estadoNormalizado = mesa.estado ? mesa.estado.toLowerCase() : 'disponible';
             const estadoClase = estadoNormalizado === 'disponible' ? 'disponible' : 'ocupada';
             const tagTexto = estadoNormalizado === 'disponible' ? 'LIBRE' : 'OCUPADA';
@@ -143,7 +285,7 @@ async function ejecutarBajaMesa(id, numero) {
         try {
             await eliminarMesa(id);
             alert('Mesa removida con éxito.');
-            cargarMapaMesas(contenedorGrid); 
+            await cargarMapaMesas(contenedorGrid); 
         } catch (error) {
             alert(error.message);
         }
@@ -151,11 +293,46 @@ async function ejecutarBajaMesa(id, numero) {
 }
 
 function abrirDetalleMesa(mesa) {
-    const modalDetalle = document.getElementById('modal-detalle-mesa');
     if (!modalDetalle) return;
+    mesaSeleccionadaActual = mesa; // Fijamos el contexto de operación
+
     document.getElementById('detalle-titulo-mesa').innerText = `🪑 Mesa ${mesa.numeroMesa}`;
     const badgeEstado = document.getElementById('detalle-badge-estado');
-    badgeEstado.innerText = mesa.estado.toUpperCase();
-    badgeEstado.className = `tag-estado ${mesa.estado.toLowerCase() === 'disponible' ? 'disponible' : 'ocupada'}`;
+    
+    const estado = mesa.estado ? mesa.estado.toUpperCase() : 'DISPONIBLE';
+    badgeEstado.innerText = estado;
+    badgeEstado.className = `tag-estado ${estado.toLowerCase() === 'disponible' ? 'disponible' : 'ocupada'}`;
+    
+    // Bloquear o desbloquear controles si la mesa está libre o sin consumo activo
+    const btnAbrirCambio = document.getElementById('btn-abrir-cambio');
+    const btnConfirmarEntrega = document.getElementById('btn-confirmar-entrega');
+    
+    if (estado === 'DISPONIBLE') {
+        if(btnAbrirCambio) btnAbrirCambio.style.display = 'none';
+        if(btnConfirmarEntrega) btnConfirmarEntrega.style.display = 'none';
+        document.getElementById('lista-pedidos-ready').innerHTML = '<li><i>Sin pedidos activos</i></li>';
+        document.getElementById('lista-pedidos-kitchen').innerHTML = '<li><i>Sin pedidos activos</i></li>';
+        document.getElementById('cant-ready').innerText = '0';
+        document.getElementById('cant-kitchen').innerText = '0';
+    } else {
+        if(btnAbrirCambio) btnAbrirCambio.style.display = 'inline-block';
+        if(btnConfirmarEntrega) btnConfirmarEntrega.style.display = 'inline-block';
+        
+        inyectarPedidosSimulados();
+    }
+
     modalDetalle.style.display = 'flex';
+}
+
+function inyectarPedidosSimulados() {
+    document.getElementById('cant-ready').innerText = '2';
+    document.getElementById('lista-pedidos-ready').innerHTML = `
+        <li>🍗 1x Pollo Asado al Carbón</li>
+        <li>🍹 2x Tiste en Jícara</li>
+    `;
+    
+    document.getElementById('cant-kitchen').innerText = '1';
+    document.getElementById('lista-pedidos-kitchen').innerHTML = `
+        <li>🍲 1x Sopa de Albóndigas (Marchando...)</li>
+    `;
 }
