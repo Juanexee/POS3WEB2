@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <title>Categorías</title>
 
-    <!-- CONEXIÓN AL CSS -->
     <link rel="stylesheet" href="../../shared/styles/Categoria.css">
 </head>
 <body>
 
-    
-  <aside>
+    <aside>
         <div class="perfil">
             <img src="IMG/USER1.png" alt="Usuario">
             <p>user1</p>
@@ -19,8 +17,8 @@
             <ul>
                 <li><a href="../../pages/admin/inicio.html">🏠Inicio</a></li>
                 <li><a href="../../pages/categorias/Categoria.html" class="active">📁 Categorías</a></li>
-                <li><a href="../../pages/platillos/Platillo.html" >🍔 Platillos</a></li>
-                 <li><a href="../../pages/mesas/Mesas.html">🪑 Mesas</a></li>
+                <li><a href="../../pages/platillos/Platillo.html">🍔 Platillos</a></li>
+                <li><a href="../../pages/mesas/Mesas.html">🪑 Mesas</a></li>
                 <li><a href="../../pages/personal/Personal.html">👥 Personal</a></li>
                 <li><a href="../../pages/cocina/Cocina.html">🍳 Cocina</a></li>
                 <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
@@ -28,133 +26,41 @@
         </nav>
     </aside>
 
-    <!-- CONTENIDO PRINCIPAL -->
     <main>
 
         <header>
             <h1>Categorías</h1>
         </header>
 
-        
-        <!-- HERRAMIENTAS -->
         <div class="herramientas">
-            <button id="btn-agregar-platillo" class="btn-primary" title="Agregar Platillo" formaction="../../shared/modals/modalCategoria.html">+</button>
+            <button id="btn-agregar-platillo" class="btn-primary" title="Agregar Categoría">+</button>
 
-            <!-- BUSCADOR -->
             <div class="input-busqueda">
                 <span>🔍</span>
-                <input type="text" placeholder="Buscar...">
-           </div>
-              <!--AGREGAR -->
-            
+                <input type="text" id="input-buscar-categoria" placeholder="Buscar...">
+            </div>
         </div>
 
-        <!-- TABLA -->
-        <table>
+        <table id="tabla-categorias">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>N°</th>
                     <th>Nombre</th>
-                    <th>Acción</th>
+                    <th style="text-align: right; padding-right: 30px;">Acciones</th>
                 </tr>
             </thead>
-           <tbody>
-    <tr>
-        <td>1</td>
-        <td>Bebidas Naturales</td>
-        <td>
-            <button class="btn-edit">✏️</button>
-            <button class="btn-delete">🗑️</button>
-        </td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>Bebidas Carbonatadas</td>
-        <td>
-            <button class="btn-edit">✏️</button>
-            <button class="btn-delete">🗑️</button>
-        </td>
-    </tr>
-    <tr>
-        <td>3</td>
-        <td>Alitas y Boneless</td>
-        <td>
-            <button class="btn-edit">✏️</button>
-            <button class="btn-delete">🗑️</button>
-        </td>
-    </tr>
-    <tr>
-        <td>4</td>
-        <td>Hamburguesas</td>
-        <td>
-            <button class="btn-edit">✏️</button>
-            <button class="btn-delete">🗑️</button>
-        </td>
-    </tr>
-    <tr>
-        <td>5</td>
-        <td>Burritos y Wraps</td>
-        <td>
-            <button class="btn-edit">✏️</button>
-            <button class="btn-delete">🗑️</button>
-        </td>
-    </tr>
-    <tr>
-        <td>6</td>
-        <td>Entradas / Snacks</td>
-        <td>
-            <button class="btn-edit">✏️</button>
-            <button class="btn-delete">🗑️</button>
-        </td>
-    </tr>
-    <tr>
-        <td>7</td>
-        <td>Cortes de Carne</td>
-        <td>
-            <button class="btn-edit">✏️</button>
-            <button class="btn-delete">🗑️</button>
-        </td>
-    </tr>
-    <tr>
-        <td>8</td>
-        <td>Ensaladas</td>
-        <td>
-            <button class="btn-edit">✏️</button>
-            <button class="btn-delete">🗑️</button>
-        </td>
-    </tr>
-    <tr>
-        <td>9</td>
-        <td>Postres</td>
-        <td>
-            <button class="btn-edit">✏️</button>
-            <button class="btn-delete">🗑️</button>
-        </td>
-    </tr>
-    <tr>
-        <td>10</td>
-        <td>Guarniciones / Extras</td>
-        <td>
-            <button class="btn-edit">✏️</button>
-            <button class="btn-delete">🗑️</button>
-        </td>
-    </tr>
-
-    
-    
-</tbody>
-
-
+            <tbody>
+                </tbody>
         </table>
 
-   <div class="paginacion">
-                <button id="btn-prev">Anterior</button>
-                <span id="info-pagina">Página 1 de 2</span>
-                <button id="btn-next">Siguiente</button>
-            </div>
+        <div class="paginacion">
+            <button id="btn-prev">Anterior</button>
+            <span id="info-pagina">Página 1 de 1</span>
+            <button id="btn-next">Siguiente</button>
+        </div>
     </main>
 
-    <div class="modal-overlay"style="display: none;" id="modal-categoria">
+    <div class="modal-overlay" id="modal-categoria" style="display: none;">
         <div class="modal-content">
             
             <header class="modal-header">
@@ -163,7 +69,6 @@
 
             <main class="modal-body">
                 <form id="form-categoria">
-                    
                     <div class="fila-formulario">
                         <div class="campo">
                             <label for="categoria-id">Categoría ID</label>
@@ -177,17 +82,18 @@
                             <input type="text" id="nombre-categoria" name="nombre" placeholder="Ej: Hamburguesas, Bebidas Naturales" required maxlength="100">
                         </div>
                     </div>
-
                 </form>
             </main>
 
             <footer class="botones-acciones">
-                <button type="submit" form="form-categoria" class="btn-guardar" formaction="../../pages/categorias/Categoria.html">Guardar</button>
-                <button type="button" class="btn-salir" onclick="window.location.href='../../pages/categorias/Categoria.html'">Salir</button>
+                <button type="submit" form="form-categoria" class="btn-guardar">Guardar</button>
+                <button type="button" class="btn-salir">Salir</button>
             </footer>
 
         </div>
     </div>
+
+    <script type="module" src="./categoriaController.js"></script>
 
 </body>
 </html>
