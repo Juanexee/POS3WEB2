@@ -1,28 +1,78 @@
 /* ============================================================
-   MÓDULO DE FACTURACIÓN - EL RANCHO DE LA MIMI (Mobile-First)
+   MÓDULO DE FACTURACIÓN - EL RANCHO DE LA MIMI
    ============================================================ */
 
 :root {
     --bg-tarjeta: #1A1A1A;
     --naranja-primario: #FF6B00;
     --naranja-suave: #FF8933;
-    --marrón-detalle: #814915;
     --blanco: #ffffff;
     --gris-fondo: #f9fafb;
-    --azul-paid: #1e3a8a;
-    --verde-complete: #2ecc71;
+    --verde-exito: #28a745;
+    --amarillo-pendiente: #ffc107;
 }
 
-/* --- DISEÑO ENFOQUE MÓVIL --- */
-
-/* Ocultar la tabla clásica en pantallas de celulares */
-.invoice-table-container {
-    display: none;
+/* Estilos generales */
+main {
+    padding: 20px;
+    overflow-x: auto;
 }
 
-/* Grid vertical de tarjetas táctiles para móviles */
-.invoice-cards-container {
+header h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.herramientas {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.input-busqueda {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    gap: 8px;
+    flex: 1;
+    max-width: 300px;
+}
+
+.input-busqueda input {
+    border: none;
+    outline: none;
+    width: 100%;
+}
+
+.btn-refrescar {
+    background-color: #0e0e0e;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-refrescar:hover {
+    background-color: #333;
+    transform: scale(1.02);
+}
+
+/* ============================================================
+   VISTA MÓVIL - TARJETAS
+   ============================================================ */
+.invoice-cards-container {
+    display: none;
     flex-direction: column;
     gap: 15px;
     margin-top: 20px;
@@ -35,20 +85,20 @@
     padding: 15px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     position: relative;
-    overflow: hidden;
-    border-left: 6px solid #ccc; /* Estado genérico */
+    border-left: 6px solid #ccc;
+    transition: transform 0.2s ease;
 }
 
-/* Indicadores de barras laterales por estados */
-.invoice-card.status-paid { border-left-color: var(--azul-paid); }
-.invoice-card.status-complete { border-left-color: var(--verde-complete); }
+.invoice-card:hover {
+    transform: translateY(-2px);
+}
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #333;
-    padding-bottom: 8px;
+    padding-bottom: 10px;
     margin-bottom: 10px;
 }
 
@@ -58,261 +108,485 @@
     color: var(--naranja-suave);
 }
 
-/* Badges de estados uniformes */
+/* Estados */
+.invoice-card.status-pagado { border-left-color: var(--verde-exito); }
+.invoice-card.status-pendiente { border-left-color: var(--amarillo-pendiente); }
+
 .badge {
     padding: 4px 12px;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: bold;
     text-transform: uppercase;
-    color: var(--blanco);
 }
 
-.invoice-card.status-paid .status-badge, .row-paid .status-badge { background-color: var(--azul-paid); }
-.invoice-card.status-complete .status-badge, .row-complete .status-badge { background-color: var(--verde-complete); }
+.badge-pagado {
+    background-color: var(--verde-exito);
+    color: white;
+}
+
+.badge-pendiente {
+    background-color: var(--amarillo-pendiente);
+    color: #333;
+}
 
 .card-body p {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     margin: 5px 0;
     color: #ccc;
 }
 
 .invoice-total {
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
     font-weight: bold;
     color: var(--naranja-primario) !important;
     margin-top: 8px !important;
 }
 
-/* Botones de acción rápidos para el pulgar */
-.card-actions, .table-actions {
+.card-actions {
     display: flex;
     gap: 10px;
-    margin-top: 15px;
+    margin-top: 12px;
     justify-content: flex-end;
 }
 
 .btn-action {
     border: none;
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 8px;
-    color: var(--blanco);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
-    transition: 0.3s;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
 }
 
-.btn-view { background-color: #4b5563; }
-.btn-print { background-color:#0e0e0e; }
-.btn-delete { background-color: #dc3545; }
+.btn-view { background-color: #4b5563; color: white; }
+.btn-print { background-color: #0e0e0e; color: white; }
 
 .btn-action:hover {
     transform: translateY(-2px);
     opacity: 0.9;
 }
 
+/* ============================================================
+   VISTA DESKTOP - TABLA
+   ============================================================ */
+.invoice-table-container {
+    display: block;
+    background: white;
+    border-radius: 12px;
+    overflow-x: auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-top: 20px;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.invoice-table th {
+    background-color: #0e0e0e;
+    color: white;
+    padding: 14px;
+    font-weight: 600;
+}
+
+.invoice-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.invoice-table tbody tr:hover {
+    background-color: #f3f4f6;
+}
+
+.text-bold {
+    font-weight: bold;
+    color: var(--naranja-primario);
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Estado en tabla */
+.estado-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.estado-pagado {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.estado-pendiente {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.table-actions {
+    display: flex;
+    gap: 8px;
+}
 
 /* ============================================================
-   DISEÑO EN DESKTOP / ESCRITORIO (min-width: 768px)
+   MODALES
    ============================================================ */
-@media (min-width: 768px) {
-    /* Ocultamos las tarjetas móviles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(1.5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 550px;
+    max-height: 90vh;
+    border-radius: 20px;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-header-estandar {
+    background-color: #ff6b00;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.modal-header-estandar h3 {
+    color: white;
+    margin: 0;
+}
+
+.factura-numero {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 4px 12px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    color: white;
+    font-size: 0.8rem;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+/* Info factura */
+.info-factura {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 0.9rem;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #555;
+}
+
+.info-value {
+    color: #333;
+}
+
+/* Lista de productos */
+.detalle-productos h4 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.lista-productos {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.producto-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 0.85rem;
+}
+
+.producto-item:last-child {
+    border-bottom: none;
+}
+
+.producto-nombre {
+    flex: 2;
+}
+
+.producto-cantidad {
+    flex: 0.5;
+    text-align: center;
+}
+
+.producto-precio {
+    flex: 0.8;
+    text-align: right;
+}
+
+/* Totales */
+.totales-factura {
+    margin: 15px 0;
+    padding: 15px;
+    background: #fff3e6;
+    border-radius: 10px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-label {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.total-valor {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ff6b00;
+}
+
+.separador {
+    height: 1px;
+    background: #eee;
+    margin: 20px 0;
+}
+
+/* Campos del modal */
+.fila-formulario {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.fila-formulario .campo {
+    flex: 1;
+}
+
+.campo label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.campo input,
+.metodo-pago select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.campo input:focus,
+.metodo-pago select:focus {
+    outline: none;
+    border-color: #ff6b00;
+    box-shadow: 0 0 0 3px rgba(255,107,0,0.1);
+}
+
+.input-cambio {
+    background-color: #e8f5e9;
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.metodo-pago {
+    margin-bottom: 20px;
+}
+
+.metodo-pago label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+/* Botones del modal */
+.botones-acciones {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.botones-acciones button {
+    min-width: 120px;
+    height: 42px;
+    padding: 0 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-salir {
+    background-color: #f1f2f6;
+    color: #2d3748;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-salir:hover {
+    background-color: #e2e8f0;
+}
+
+.btn-guardar {
+    background-color: #ff6b00;
+    color: white;
+}
+
+.btn-guardar:hover {
+    background-color: #e55a00;
+    transform: translateY(-1px);
+}
+
+/* Ticket modal */
+.ticket-modal {
+    max-width: 400px;
+}
+
+.ticket-contenido {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 10px;
+}
+
+.ticket-contenido .ticket-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.ticket-contenido .ticket-line {
+    border-top: 1px dashed #333;
+    margin: 5px 0;
+}
+
+/* Paginación */
+.paginacion {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 25px;
+    padding-bottom: 20px;
+}
+
+.paginacion button {
+    background-color: #0e0e0e;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.paginacion button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .invoice-table-container {
+        display: none;
+    }
+    
+    .invoice-cards-container {
+        display: flex;
+    }
+    
+    .herramientas {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .input-busqueda {
+        max-width: 100%;
+    }
+    
+    .fila-formulario {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .botones-acciones {
+        flex-direction: column;
+    }
+    
+    .botones-acciones button {
+        width: 100%;
+    }
+}
+
+@media (min-width: 769px) {
     .invoice-cards-container {
         display: none;
     }
-
-    /* Activamos la tabla clásica amplia */
+    
     .invoice-table-container {
         display: block;
-        background: var(--blanco);
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        margin-top: 20px;
-    }
-
-    .invoice-table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-    }
-
-    .invoice-table th {
-        background-color: var(--bg-tarjeta);
-        color: var(--blanco);
-        padding: 16px;
-        font-weight: 600;
-        border-bottom: 2px solid var(--marrón-detalle);
-    }
-
-    .invoice-table td {
-        padding: 14px 16px;
-        border-bottom: 1px solid #eee;
-        color: #333;
-        font-size: 0.95rem;
-    }
-
-    /* Colores sutiles para los renglones según el estado */
-    .row-paid { background-color: rgba(30, 58, 170, 0.03); }
-    .row-complete { background-color: rgba(46, 204, 113, 0.03); }
-    
-    .invoice-table tbody tr:hover {
-        background-color: #f3f4f6;
-    }
-
-    .text-bold {
-        font-weight: bold;
-        color: var(--naranja-primario);
-    }
-
-    .table-actions {
-        margin-top: 0;
     }
 }
 
-/* ============================================================
-   ESTRUCTURA DEL CUERPO DEL FORMULARIO (MODAL BODY)
-   ============================================================ */
-.modal-body {
-    padding: 25px 30px;              /* Unificamos márgenes internos perfectos */
-    display: flex;
-    flex-direction: column;          /* Organiza las filas verticalmente */
-    gap: 18px;                       /* Separación idéntica y limpia entre cada fila */
-}
-
-/* Forzamos a que cada grupo de inputs se comporte como una fila flexible */
-.modal-body form, 
-#form-factura-transaccion {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    width: 100%;
-}
-
-/* --- FILAS DE DOS COLUMNAS (Mesa/Mesero y Pago/Cambio) --- */
-.fila-formulario {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;                       /* Espacio horizontal exacto entre los dos campos */
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Cada campo individual (Label + Input) toma el 50% de la fila */
-.fila-formulario .campo,
-.form-group {
-    display: flex;
-    flex-direction: column;
-    flex: 1;                         /* Hace que ambos midan exactamente lo mismo */
-    width: 50%;
-    box-sizing: border-box;
-}
-
-/* Excepción: El campo del Importe Total ocupa todo el ancho de su fila */
-.modal-body .form-group:not(.fila-formulario .campo) {
-    width: 100%;
-}
-
-/* --- ESTILOS DE LOS INPUTS Y ETIQUETAS --- */
-.form-group label, 
-.fila-formulario .campo label {
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #444;
-    font-size: 0.9rem;
-    text-align: left;
-}
-
-.form-group input, 
-.fila-formulario .campo input {
-    width: 100% !important;          /* Obliga al input a no salirse de su contenedor de 50% */
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    outline: none;
-    box-sizing: border-box;          /* Evita que el padding sume tamaño extra al ancho */
-    transition: 0.3s;
-}
-
-.form-group input:focus,
-.fila-formulario .campo input:focus {
-    border-color: #0e0e0e;     
-
-    box-shadow: 0 0 8px rgba(255, 107, 0, 0.2);
-}
-
-/* Campos deshabilitados o de lectura */
-.input-disabled, .input-readonly {
-    background-color: var(--gris-fondo);
-    color: #444;
-    font-weight: bold;
-    border-color: #eee !important;
-}
-
-/* Resaltado del Cambio en Naranja de Adobe Color */
-.text-highlight {
-    color: var(--naranja-primario) !important;
-    font-size: 1.25rem !important;
-    font-weight: 700 !important;
-    border: 1px solid rgba(255, 107, 0, 0.4) !important;
-    background-color: #fffaf7 !important;
-}
-
-/* --- PIE DEL MODAL (BOTONES TOTALMENTE AJUSTADOS) --- */
-.modal-footer {
-    background: #ffffff;
-    padding: 15px 30px 25px 30px;    /* Ajuste para eliminar el espacio blanco excesivo */
-    display: flex;
-    justify-content: center;        /* Centra los botones de forma elegante */
-    align-items: center;
-    gap: 15px;
-    border-top: 1px solid #eee;
-}
-
-.mesa {
-    position: relative; /* Para poder posicionar de forma absoluta las acciones dentro */
-    /* ... Tus estilos base ... */
-}
-
-.acciones-mesa-card {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    display: flex;
-    gap: 6px;
-    opacity: 0.3; /* Silenciosos por defecto */
-    transition: opacity 0.2s ease;
-}
-
-.mesa:hover .acciones-mesa-card {
-    opacity: 1; /* Resaltan al pasar el mouse por encima */
-}
-
-.btn-editar-rapido, .btn-eliminar-rapido {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    border-radius: 4px;
-    padding: 4px 6px;
-    cursor: pointer;
-    font-size: 12px;
-    transition: background 0.2s;
-}
-
-.btn-editar-rapido:hover {
-    background: #ffc107;
-}
-
-.btn-eliminar-rapido:hover {
-    background: #dc3545;
-}
-
-.capacidad-text {
-    font-size: 11px;
-    color: #b3b3b3;
-    margin: 5px 0;
+.loading-cards, .text-center {
+    text-align: center;
+    padding: 20px;
+    color: #666;
 }
