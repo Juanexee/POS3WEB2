@@ -27,7 +27,7 @@ export async function login(nombreUsuario, password) {
     const data = await response.json(); // Retorna el JSON con el token JWT
     return data; 
 }
-
+    
 /**
  * Guarda de forma segura el Token en el almacenamiento local del navegador
  */
