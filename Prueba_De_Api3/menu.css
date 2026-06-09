@@ -1,0 +1,674 @@
+/* --- ESTILOS GENERALES --- */
+* { 
+    margin: 0;
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', sans-serif;
+}
+body { 
+    background-color: #fdfdfd;
+    padding-bottom: 80px; 
+}
+.bg-dark {
+background-color: #000; 
+color: white;
+}
+.container { 
+    width: 100%;       /* Asegura que ocupe todo el ancho disponible */
+    padding: 0;        /* Quitamos el espacio de los lados del contenedor principal */
+    margin: 0;
+}
+.product-link {
+    text-decoration: none; 
+    color: inherit;
+    display: block;
+}
+.title-white {
+margin-bottom: 15px; 
+}
+
+/* --- PANTALLA INICIO CORREGIDA --- */
+.header-app {
+    display: flex;
+    justify-content: flex-end; /* Manda el icono a la derecha */
+    width: 100%;
+    padding: 0; 
+}
+
+.search-container {
+    background: #f1f1f1;
+    padding: 12px 15px; 
+    border-radius: 50px; 
+    display: flex;
+    align-items: center;
+    width: 100%;         /* esto lo hace largo */
+    margin-top: -15px;   /* Sube el buscador para pegarlo a la tarjeta negra */
+    margin-bottom: 10px; /* Espacio pequeño con lo que sigue */
+    box-sizing: border-box;
+
+}
+
+.search-container input {
+    border: none;
+    background: transparent; 
+    margin-left: 10px;
+    outline: none;
+    width: 100%;        /* El texto también usa todo el ancho */
+    font-size: 16px;
+}
+/* --- ACTUALIZACIÓN DEL LOGO EN PROMO-CARD --- */
+.promo-card { 
+    background: #1a1a1a; 
+    color: white; 
+    /* Cambiamos esto para que pegue a los bordes */
+    width: 100%; 
+    margin: 0; 
+    padding: 30px 20px; /* Espacio interno para que el texto no pegue al borde */
+    
+    /* Curva solo en las esquinas de abajo */
+    border-radius: 0; 
+    
+    display: flex; 
+    justify-content: space-between;     
+    align-items: center; 
+    margin-bottom: 25px; /* Espacio para que el buscador no quede pegado */
+    overflow: hidden;
+}
+
+.promo-card img {
+    width: 120px;      /* Tamaño ideal para que no choque con el texto */
+    height: 130px;
+    object-fit: cover; /* Para que la imagen no se vea aplastada */
+    border-radius: 60%; /* Hace el logo circular y quita el fondo blanco cuadrado */
+    border: 5px solid #ffc107; /* Borde amarillo como el del productos */
+    background-color: white;  /* Mantiene el fondo blanco solo dentro del círculo */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Le da profundidad */
+}
+
+.grid-menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px; /* Un poco menos de espacio para que las tarjetas respiren */
+    align-items: start;
+}
+.food-item {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 15px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espacio entre imagen y texto */
+    min-height: 280px; /* Le damos un mínimo para que todas sean iguales */
+}   
+.food-item img {
+    width: 100%;
+    height: 200px; /* Subimos de 150px a 200px para que se observe mas*/
+    object-fit: cover; /* Mantiene la proporción sin estirar */
+    object-position: center; /* Centra la foto */
+    border-radius: 15px;
+    display: block;
+}
+.food-details {
+    text-align: left;
+}
+.food-details p { 
+    color: #ffc107;
+    font-weight: bold;
+}
+.add-indicator {
+    position: absolute;
+    bottom: 10px;
+    right: 10px; 
+    background: #ffc107;
+    color: black;
+    width: 25px; 
+    height: 25px;
+    border-radius: 8px; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    font-weight: bold;
+}
+.fav-btn { 
+    position: absolute; 
+    top: 10px;
+    right: 10px;
+    background: transparent; border: none;
+}
+
+/* --- PANTALLA DETALLE --- */
+.centered {
+    text-align: center; 
+    }
+.product-large-img img { 
+    width: 250px; 
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15)); 
+    margin: 20px 0;
+}
+.detail-price { 
+    font-size: 2.2rem;
+    color: #FFC107;
+    margin: 15px 0; 
+    }
+.qty-selector-detail { 
+    display: flex;
+    justify-content: center; 
+    align-items: center; gap:
+    20px; margin: 15px 0;
+}
+.qty-circle {
+    width: 40px;
+    height: 40px; 
+    border-radius: 50%; 
+    border: 1px solid #ddd;
+    background: white; 
+    font-size: 1.2rem; 
+    }
+.qty-num { 
+    font-size: 1.3rem; 
+    font-weight: bold; 
+}
+
+/* --- PANTALLA OPCIONES EL GRID --- */
+.ingredient-item {
+    display: grid;
+    grid-template-columns: 50px 1fr auto;
+    align-items: center;
+    gap: 15px; 
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    }
+.small-product-info {
+    display: flex; 
+    align-items: center; gap: 15px;
+    }
+
+/* --- BOTONES --- */
+.btn-yellow {
+    display: block; 
+    background: #FFC107; 
+    color: black;
+    text-align: center; 
+    padding: 18px; 
+    border-radius: 50px; 
+    text-decoration: none; 
+    font-weight: bold;
+    margin-top: 10px; 
+    border: none; 
+    width: 100%; 
+    }
+.btn-outline { 
+    display: block; 
+    border: 1px solid #ccc; 
+    text-align: center;
+    padding: 18px; 
+    border-radius: 50px; 
+    text-decoration: none; 
+    color: #666; 
+    margin-bottom: 10px; 
+    }
+.btn-order {
+    width: 100%; 
+    background: black; 
+    color: white; 
+    padding: 18px;
+    border-radius: 15px; 
+    border: none;
+    font-weight: bold; 
+    margin-top: 20px; 
+    }
+
+/* --- NAV INFERIOR --- */
+.bottom-nav {
+position: fixed; 
+bottom: 0; 
+width: 100%; 
+background: white; 
+height: 65px; 
+display: flex; 
+justify-content: space-around; 
+align-items: center;
+box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+.bottom-nav a { 
+    text-decoration: none; 
+    font-size: 24px; 
+}
+
+/* Estilos para que el carrito se vea ordenado */
+/* Esto es algo nuevo para que se vea mejor en el carrito*/
+.cart-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.item-img img {
+    width: 70px;
+    height: 70px;
+    border-radius: 12px;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.item-info { flex-grow: 1; }
+
+.item-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.qty-btn {
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+}
+
+/* Algo nuevo del menu que a dividido */
+.category-title {
+    margin-top: 30px; /* Esto da espacio entre secciones */
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding-left: 5px;
+}
+
+
+
+/* --- ESTILOS PARA LA PÁGINA DE DETALLE --- */
+
+/* Contenedor de la imagen arriba */
+.product-image-large img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover; /* Esto hace que la foto no se estire feo */
+    border-radius: 0 0 20px 20px;
+}
+
+/* La tarjeta blanca donde va el nombre y precio */
+.product-info-card {
+    padding: 20px;
+    background: #fff;
+}
+
+.product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.product-header h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #e67e22; /* Color naranja para que resalte */
+}
+
+/* El botón de agregar al carrito */
+.add-to-cart {
+    width: 100%;
+    padding: 15px;
+    background-color: #ffcc00; /* Color amarillo del Rancho */
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+/* Estilo para las opciones de tamaño */
+.size-chips span {
+    display: inline-block;
+    padding: 8px 15px;
+    background: #f0f0f0;
+    border-radius: 20px;
+    margin-right: 10px;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+/* Probando estilo para la parte de personalizar*/
+/* Contenedor de cada grupo (Tamaño, Extras, etc.) */
+.option-group {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 30px;
+    text-align: left;
+    padding: 0 20px;
+}
+
+.option-group h3 {
+    color: #ffc107; /* El amarillo de Rancho la Mimi */
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    border-left: 4px solid #ffc107;
+    padding-left: 10px;
+}
+
+/* Lista de opciones */
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Cada tarjeta de opción (el "botón" entero) */
+.option-item {
+    background: #252525; /* Fondo oscuro para resaltar */
+    padding: 18px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Texto a la izquierda, círculo a la derecha */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+/* agregando algo nuevo para que nose pege */
+margin-bottom: 5px;   
+
+}
+
+/* Efecto cuando pasas el mouse o seleccionas */
+.option-item:hover {
+    background: #333;
+    border-color: #444;
+}
+
+/* Estilo para los inputs (círculos y cuadros) */
+.option-item input[type="radio"], 
+.option-item input[type="checkbox"] {
+    accent-color: #ffc107; /* Cambiar el color del check al amarillo del logo */
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* Texto dentro de la opción */
+.option-item span {
+    color: #e0e0e0;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+
+
+
+/* Ajuste para el botón de confirmar */
+.btn-yellow {
+    background: #ffc107;
+    color: #000;
+    padding: 18px;
+    border-radius: 50px; /* Bordes muy redondeados */
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+/* --- ESTILO PARA EL BOTÓN ATRÁS --- */
+.header-back {
+    display: flex !important;
+    justify-content: flex-start !important; /* Fuerza la izquierda */
+    padding: 20px 20px 10px 20px;
+    width: 100%;
+    background: transparent;
+}
+
+.back-btn {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 1.1rem;
+    background: #f1f1f1; /* Un fondito gris suave para que parezca botón */
+    padding: 8px 15px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Esto pone el cuadro negro con letras blancas */
+.option-group .custom-note {
+    background-color: #1a1a1a ; /* Fondo negro */
+    color: #ffffff ;           /* las lestra blancas*/
+    border: 1px solid #333;   /* Borde sutil */
+    border-radius: 15px ;      /* Bordes redondeados */
+    width: 100% ;
+    height: 120px ;
+    padding: 15px;
+    font-size: 1rem;
+    outline: none ;
+    resize: none;
+    display: block ;
+    margin-top: 10px ;
+}
+
+/* Para que el texto de ejemplo (placeholder) también se vea claro */
+.option-group .custom-note::placeholder {
+    color: #888 ; /* Gris clarito */
+}
+
+/* Cuando el cliente está escribiendo */
+.option-group .custom-note:focus {
+    border-color: #ffc107 ; /* El borde brilla en amarillo al tocarlo */
+}
+
+/* --- Adaptacion para compu (Pantallas grandes) --- */
+@media (min-width: 1024px) {
+    
+    /* El contenedor principal ya no ocupa el 100%, le damos un máximo para que no se estire infinito */
+    .container {
+        max-width: 100%; /* donde defnimos el ancho ponemos un limite */
+        margin: 0; /* Lo centra en la pantalla */
+        padding: 10px;
+    }
+
+    /* El catálogo pasa de 2 columnas a 4 columnas */
+    .grid-menu {
+        grid-template-columns: 1fr 1fr 1fr 1fr; 
+        gap: 25px; /* Más espacio entre platos */
+    }
+
+    /* Ajustamos el tamaño de las tarjetas para que no se vean tan largas */
+    .food-item {
+        min-height: auto;
+    }
+
+    /* La barra de navegación inferior ya no es necesaria en PC, 
+       pero para no romper el flujo, podemos centrarla */
+    .bottom-nav {
+        max-width: 500px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 30px 30px 0 0;
+    }
+
+    /* nueva clase para manejar la descripcion de los productos*/
+.detail-description {
+    color: #555555;         
+    font-size: 1rem;         
+    line-height: 1.5;        
+    margin: 10px auto 0 auto;
+    max-width: 450px;        
+    padding: 0 20px;     
+}
+
+
+/* Controla la descripción limpia sin usar clases nuevas */
+.product-details-bottom p {
+    color: #222222;          /*Cambiado a un negro suave (antes era #555555) */
+    font-size: 1rem;         
+    line-height: 1.5;        
+    max-width: 450px;        
+    margin: 0 auto 15px auto;
+    width: 100%;             
+    font-weight: 500;        /*Le da un toque apenas más grueso a la letra */
+}
+
+}
+
+/* --- ESTILOS ADICIONALES PARA PERSONALIZADOR Y CARRITO --- */
+
+/* Personalizador - Resumen de Platillo */
+.small-product-info-customizer {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    max-width: 500px;
+    margin: 0 auto 25px auto;
+    background: #1a1a1a;
+    border-radius: 15px;
+    color: white;
+}
+
+.small-product-info-customizer img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #ffc107;
+}
+
+.small-product-info-customizer .info-text {
+    text-align: left;
+    flex-grow: 1;
+}
+
+.small-product-info-customizer .info-text h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+.small-product-info-customizer .info-text p {
+    margin: 5px 0 0 0;
+    color: #ffc107;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.opciones-contenedor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.detail-actions-customizer {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* Carrito - Cabecera y Contenedor */
+.cart-header-custom {
+    padding: 20px 20px 10px 20px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.cart-header-custom h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: black;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.cart-main-container {
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Carrito - Resumen de Pago */
+.cart-summary-block {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 15px;
+    border: 1px solid #eee;
+}
+
+.cart-summary-block .summary-row-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #666;
+}
+
+.cart-summary-block .summary-row-item .bold-text {
+    font-weight: bold;
+}
+
+.cart-summary-block .summary-total-item {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: #000;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+}
+
+.cart-summary-block .summary-total-item .total-val {
+    color: #ffc107;
+}
+
+/* Carrito - Detalles de Personalización del Item */
+.cart-item-details {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 3px 0 8px 0;
+    line-height: 1.3;
+    text-align: left;
+}
+
+.cart-item-details strong {
+    font-weight: bold;
+}
+
+.cart-item h2 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 0;
+    color: black;
+    text-align: left;
+}
+
+.cart-item .price {
+    font-weight: bold;
+    color: #ffc107;
+    font-size: 1.1rem;
+    margin: 5px 0 0 0;
+    text-align: left;
+}
+
+.cart-item .qty-val {
+    font-weight: bold;
+    font-size: 1rem;
+    min-width: 20px;
+    text-align: center;
+}

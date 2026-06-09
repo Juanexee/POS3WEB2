@@ -1,52 +1,89 @@
 // shared/services/categoriaService.js
-const API_URL = 'https://localhost:7081'; 
 
-function obtenerCabeceras() {
-    const token = localStorage.getItem('token');
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-    };
+import HttpService from './HttpService.js';
+
+export default class CategoriaService extends HttpService {
+    
+    constructor() {
+        super();
+        this.endpointBase = '/Categoria';
+    }
+
+    async obtenerTodas() {
+        // Ahora la URL será: https://localhost:7081/api/Categoria/Leer
+        const response = await this.get(`${this.endpointBase}/Leer`);
+        
+        if (response.success === false) {
+            console.error('Error en obtenerTodas:', response);
+            throw new Error(response.message || 'Error al cargar las categorías');
+        }
+        
+        if (Array.isArray(response)) {
+            return response.map(cat => ({
+                categoriaID: cat.categoriaID || cat.CategoriaID,
+                nombre: cat.nombre || cat.Nombre
+            }));
+        }
+        
+        return response;
+    }
+
+    async insertar(categoriaData) {
+        const payload = {
+            nombre: categoriaData.nombre || categoriaData.Nombre
+        };
+        
+        const response = await this.post(`${this.endpointBase}/Insertar`, payload);
+        
+        if (response.success === false) {
+            throw new Error(response.message || 'Error al insertar la categoría');
+        }
+        
+        return response;
+    }
+
+    async actualizar(id, categoriaData) {
+        const payload = {
+            nombre: categoriaData.nombre || categoriaData.Nombre
+        };
+        
+        const response = await this.put(`${this.endpointBase}/Actualizar/${id}`, payload);
+        
+        if (response.success === false) {
+            throw new Error(response.message || 'Error al actualizar la categoría');
+        }
+        
+        return response;
+    }
+
+    async eliminar(id) {
+        const response = await this.delete(`${this.endpointBase}/Eliminar/${id}`);
+        
+        if (response.success === false) {
+            throw new Error(response.message || 'No se pudo eliminar la categoría');
+        }
+        
+        return true;
+    }
 }
 
-// GET: Leer todas las categorías
+// Exportaciones para compatibilidad
 export async function obtenerCategorias() {
-    const respuesta = await fetch(`${API_URL}/Categoria/Leer`, {
-        method: 'GET',
-        headers: obtenerCabeceras()
-    });
-    if (!respuesta.ok) throw new Error('Error al cargar las categorías desde el servidor.');
-    return await respuesta.json();
+    const service = new CategoriaService();
+    return await service.obtenerTodas();
 }
 
-// POST: Insertar categoría
 export async function insertarCategoria(payload) {
-    const respuesta = await fetch(`${API_URL}/Categoria/Insertar`, {
-        method: 'POST',
-        headers: obtenerCabeceras(),
-        body: JSON.stringify(payload)
-    });
-    if (!respuesta.ok) throw new Error('Error al insertar la categoría.');
-    return await respuesta.json();
+    const service = new CategoriaService();
+    return await service.insertar(payload);
 }
 
-// PUT: Actualizar una categoría existente por su ID
 export async function actualizarCategoria(id, payload) {
-    const respuesta = await fetch(`${API_URL}/Categoria/Actualizar/${id}`, {
-        method: 'PUT',
-        headers: obtenerCabeceras(),
-        body: JSON.stringify(payload)
-    });
-    if (!respuesta.ok) throw new Error('Error al actualizar la categoría.');
-    return await respuesta.json();
+    const service = new CategoriaService();
+    return await service.actualizar(id, payload);
 }
 
-// DELETE: Eliminar / Desactivar categoría por ID
 export async function eliminarCategoria(id) {
-    const respuesta = await fetch(`${API_URL}/Categoria/Eliminar/${id}`, {
-        method: 'DELETE',
-        headers: obtenerCabeceras()
-    });
-    if (!respuesta.ok) throw new Error('No se pudo completar la baja de la categoría.');
-    return await respuesta.json();
+    const service = new CategoriaService();
+    return await service.eliminar(id);
 }

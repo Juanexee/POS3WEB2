@@ -1,0 +1,81 @@
+<!-- pages/admin/generar-qr.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar QR - Mesas | El Rancho de la Mimi</title>
+    
+    <!-- Estilos compartidos -->
+    <link rel="stylesheet" href="../../shared/styles/shared.css">
+    <link rel="stylesheet" href="../../shared/styles/admin-qr.css">
+    
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <aside>
+        <div class="perfil">
+            <img src="../../shared/images/USER1.png" alt="Usuario">
+            <p>Administrador</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="inicio.html"><i class="fas fa-home"></i> Inicio</a></li>
+                <li><a href="../categorias/Categoria.html"><i class="fas fa-folder"></i> Categorías</a></li>
+                <li><a href="../platillos/Platillo.html"><i class="fas fa-hamburger"></i> Platillos</a></li>
+                <li><a href="../mesas/Mesas.html"><i class="fas fa-chair"></i> Mesas</a></li>
+                <li><a href="../personal/Personal.html"><i class="fas fa-users"></i> Personal</a></li>
+                <li><a href="../cocina/Cocina.html"><i class="fas fa-utensils"></i> Cocina</a></li>
+                <li><a href="../facturas/Factura.html"><i class="fas fa-file-invoice"></i> Facturas</a></li>
+                <li><a href="../Rol/Roles.html"><i class="fas fa-lock"></i> Roles</a></li>
+                <li><a href="generar-qr.html" class="active"><i class="fas fa-qrcode"></i> Generar QR</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="qr-header">
+            <div class="qr-header-info">
+                <h1><i class="fas fa-qrcode"></i> Códigos QR para Mesas</h1>
+                <p>Genera códigos QR para que los clientes puedan ordenar desde su mesa</p>
+            </div>
+            <div class="qr-header-actions">
+                <button class="btn-imprimir-todos" id="btn-imprimir-todos">
+                    <i class="fas fa-print"></i> Imprimir Todos
+                </button>
+                <button class="btn-refrescar" id="btn-refrescar">
+                    <i class="fas fa-sync-alt"></i> Refrescar
+                </button>
+            </div>
+        </div>
+        
+        <div class="qr-stats">
+            <div class="stat-card">
+                <i class="fas fa-chair"></i>
+                <div class="stat-info">
+                    <span class="stat-number" id="total-mesas">0</span>
+                    <span class="stat-label">Mesas Registradas</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-qrcode"></i>
+                <div class="stat-info">
+                    <span class="stat-number" id="total-qr">0</span>
+                    <span class="stat-label">QR Generados</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="qr-container" class="qr-grid">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i> Cargando mesas...
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script type="module" src="./generar-qr.js"></script>
+</body>
+</html>

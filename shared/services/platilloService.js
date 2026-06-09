@@ -1,45 +1,91 @@
 // shared/services/platilloService.js
 
-const API_URL = 'https://localhost:7081';
+import HttpService from './HttpService.js';
+import { Platillo } from '../models/Platillo.js';
 
-function obtenerCabeceras() {
-    const token = localStorage.getItem('token');
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-    };
-}
-
-// GET: Leer todos los platillos
-export async function obtenerPlatillos() {
-    const respuesta = await fetch(`${API_URL}/Platillo/Leer`, {
-        method: 'GET',
-        headers: obtenerCabeceras()
-    });
-    if (!respuesta.ok) throw new Error('Error al leer la lista de platillos desde el servidor.');
-    return await respuesta.json();
-}
-
-// POST: Insertar un nuevo platillo
-export async function insertarPlatillo(payload) {
-    const respuesta = await fetch(`${API_URL}/Platillo/Insertar`, {
-        method: 'POST',
-        headers: obtenerCabeceras(),
-        body: JSON.stringify(payload)
-    });
-    if (!respuesta.ok) {
-        const errorData = await respuesta.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al insertar el platillo en el sistema.');
+export default class PlatilloService extends HttpService {
+    
+    constructor() {
+        super();
+        // 🔴 ANTES: this.endpointBase = '/api/Platillos';
+        // ✅ CORREGIDO: Usar la ruta exacta del backend
+        this.endpointBase = '/Platillo';
     }
-    return await respuesta.json();
+
+    async obtenerTodos() {
+        // ✅ CORREGIDO: Usar 'Leer' como en el backend
+        const response = await this.get(`${this.endpointBase}/Leer`);
+        
+        if (response.success === false) {
+            return { success: false, data: [] };
+        }
+        
+        const platillos = response.map(platilloData => new Platillo(platilloData));
+        return { success: true, data: platillos };
+    }
+
+    async obtenerPorId(id) {
+        // ✅ CORREGIDO: GET /Platillo/{id}
+        const response = await this.get(`${this.endpointBase}/${id}`);
+        
+        if (response.success === false || !response.platilloID) {
+            return { success: false, data: null };
+        }
+        
+        const platillo = new Platillo(response);
+        return { success: true, data: platillo };
+    }
+
+    async crear(platilloData) {
+        // ✅ CORREGIDO: POST /Platillo/Insertar
+        const platillo = platilloData instanceof Platillo ? platilloData : new Platillo(platilloData);
+        const validacion = platillo.validar();
+        
+        if (!validacion.valido) {
+            return { success: false, errores: validacion.errores };
+        }
+        
+        const response = await this.post(`${this.endpointBase}/Insertar`, platillo.toJSON());
+        return response;
+    }
+
+    async actualizar(id, platilloData) {
+        // ✅ CORREGIDO: PUT /Platillo/{id}/Actualizar
+        const response = await this.put(`${this.endpointBase}/${id}/Actualizar`, platilloData);
+        return response;
+    }
+
+    async eliminar(id, disponible = false) {
+        // ✅ CORREGIDO: PUT /Platillo/{id}/Disponibilidad?disponible=false
+        const response = await this.put(`${this.endpointBase}/${id}/Disponibilidad?disponible=${disponible}`);
+        return response;
+    }
 }
 
-// PUT: Cambiar la disponibilidad del platillo (Disponible / Agotado)
-export async function cambiarDisponibilidadPlatillo(id, disponible) {
-    const respuesta = await fetch(`${API_URL}/Platillo/${id}/Disponibilidad?disponible=${disponible}`, {
-        method: 'PUT',
-        headers: obtenerCabeceras()
-    });
-    if (!respuesta.ok) throw new Error('No se pudo actualizar el estado de disponibilidad.');
-    return await respuesta.json();
+// Exportaciones para compatibilidad con platillos.js
+export async function obtenerPlatillos() {
+    const service = new PlatilloService();
+    const result = await service.obtenerTodos();
+    return result.success ? result.data : [];
+}
+
+export async function obtenerPlatilloPorId(id) {
+    const service = new PlatilloService();
+    const result = await service.obtenerPorId(id);
+    return result.success ? result.data : null;
+}
+
+export async function insertarPlatillo(payload) {
+    const service = new PlatilloService();
+    return await service.crear(payload);
+}
+
+export async function actualizarPlatillo(id, payload) {
+    const service = new PlatilloService();
+    return await service.actualizar(id, payload);
+}
+
+export async function eliminarPlatillo(id, disponible) {
+    const service = new PlatilloService();
+    return await service.eliminar(id, disponible);
 }

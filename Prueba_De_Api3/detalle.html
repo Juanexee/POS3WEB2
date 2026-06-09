@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../shared/styles/menu.css">
+    <title>Detalle del Producto</title>
+</head>
+<body class="detail-page">
+    <header class="header-back">
+        <a href="index.html" class="back-btn">⬅</a>
+    </header>
+
+    <main class="container centered">
+        <div class="product-main-info">
+            <h1 id="platillo-nombre">Cargando...</h1>
+        </div>
+
+        <div class="product-large-img">
+            <img id="platillo-imagen" src="" alt="Platillo">
+        </div>
+
+        <div class="product-details-bottom">
+            <p id="platillo-descripcion"></p>
+            
+            <div class="qty-selector-detail">
+                <button class="qty-circle">-</button>
+                <span class="qty-num">01</span>
+                <button class="qty-circle">+</button>
+            </div>
+            <h2 id="platillo-precio" class="detail-price">C$ --</h2>
+        </div>
+
+        <div class="detail-actions">
+            
+            <a id="btn-personalizar-link" href="personalizar.html" class="btn-outline">Personalizar</a>
+            <button id="btn-agregar-carrito" class="btn-yellow">Agregar al Carrito</button>
+        </div>
+    </main>
+
+    <script type="module" src="detalle.js"></script>
+</body>
+</html>

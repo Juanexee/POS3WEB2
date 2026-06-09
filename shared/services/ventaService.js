@@ -1,133 +1,98 @@
-// shared/services/ventaService.js
-import { BASE_URL } from './config.js';
+// shared/services/VentaService.js
 
-/**
- * Obtiene la lista completa de ventas desde la API
- * @returns {Promise<Array>} Lista de objetos de ventas
- */
-export async function obtenerVentas() {
-    const endpoint = `${BASE_URL}/api/Ventas`;
-    const token = localStorage.getItem('token_mimi');
+import HttpService from './HttpService.js';
+import { Venta } from '../models/Venta.js';
+import { DetalleVenta } from '../models/DetalleVenta.js';
 
-    const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-
-    if (!response.ok) {
-        if (response.status === 401) {
-            throw new Error('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
-        }
-        if (response.status === 404) {
-            return []; // No hay ventas registradas
-        }
-        throw new Error('No se pudo cargar la lista de ventas del servidor.');
+export default class VentaService extends HttpService {
+    
+    constructor() {
+        super();
+        this.endpointBase = '/api/Ventas';
     }
 
-    return await response.json();
-}
-
-/**
- * Obtiene una venta específica con sus detalles
- * @param {number} id ID de la venta
- * @returns {Promise<object>} Objeto de la venta con detalles
- */
-export async function obtenerVentaPorId(id) {
-    const endpoint = `${BASE_URL}/api/Ventas/${id}`;
-    const token = localStorage.getItem('token_mimi');
-
-    const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+    // Obtener todas las ventas (facturas)
+    async obtenerTodas() {
+        const response = await this.get(this.endpointBase);
+        
+        if (response.success === false) {
+            return { success: false, message: response.message, data: [] };
         }
-    });
-
-    if (!response.ok) {
-        if (response.status === 404) {
-            throw new Error('No se encontró la factura especificada.');
-        }
-        throw new Error('Error al cargar los detalles de la factura.');
+        
+        // Destructuración y mapeo a modelos
+        const ventas = response.map(ventaData => ({
+            ventaID: ventaData.ventaID,
+            fechaVenta: ventaData.fechaVenta || ventaData.fecha_venta,
+            total: ventaData.total,
+            estado: ventaData.estado,
+            usuarioID: ventaData.usuarioID,
+            nombreCajero: ventaData.nombreCajero
+        }));
+        
+        return { success: true, data: ventas };
     }
 
-    return await response.json();
-}
-
-/**
- * Registra una nueva venta con sus detalles
- * @param {object} ventaData Objeto con los datos de la venta y sus detalles
- */
-export async function registrarVenta(ventaData) {
-    const endpoint = `${BASE_URL}/api/Ventas/registrar`;
-    const token = localStorage.getItem('token_mimi');
-
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(ventaData)
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al registrar la venta.');
+    // Obtener una venta específica con sus detalles
+    async obtenerPorId(ventaID) {
+        const response = await this.get(`${this.endpointBase}/${ventaID}`);
+        
+        if (response.success === false || !response.ventaID) {
+            return { success: false, message: response.message || 'Venta no encontrada', data: null };
+        }
+        
+        // Crear instancia de Venta (polimorfismo)
+        const venta = new Venta(response);
+        
+        return { success: true, data: venta };
     }
 
-    return await response.json();
-}
-
-/**
- * Actualiza el estado de un grupo de pedidos
- * @param {string} ids Cadena de IDs separados por coma
- * @param {string} nuevoEstado Estado destino ('EnPreparacion' o 'Listo')
- */
-export async function actualizarEstadoPedidos(ids, nuevoEstado) {
-    const endpoint = `${BASE_URL}/api/Ventas/actualizar-estado-grupo?ids=${encodeURIComponent(ids)}&nuevoEstado=${encodeURIComponent(nuevoEstado)}`;
-    const token = localStorage.getItem('token_mimi');
-
-    const response = await fetch(endpoint, {
-        method: 'PATCH',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+    // Registrar nueva venta (maestro-detalle)
+    async registrarVenta(ventaData) {
+        // Validar usando el modelo
+        const venta = ventaData instanceof Venta ? ventaData : new Venta(ventaData);
+        const validacion = venta.validar();
+        
+        if (!validacion.valido) {
+            return { 
+                success: false, 
+                message: 'Datos de venta inválidos', 
+                errores: validacion.errores 
+            };
         }
-    });
-
-    if (!response.ok) {
-        throw new Error('No se pudo actualizar el estado de los pedidos.');
+        
+        const response = await this.post(`${this.endpointBase}/registrar`, venta.toJSON());
+        
+        return response;
     }
 
-    return await response.json();
-}
-
-/**
- * Obtiene los pedidos pendientes para la cocina
- * @returns {Promise<Array>} Lista de pedidos agrupados
- */
-export async function obtenerPedidosCocina() {
-    const endpoint = `${BASE_URL}/api/Ventas/pedidos`;
-    const token = localStorage.getItem('token_mimi');
-
-    const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+    // Obtener pedidos para cocina (agrupados por platillo)
+    async obtenerPedidosCocina() {
+        const response = await this.get(`${this.endpointBase}/pedidos`);
+        
+        if (response.success === false) {
+            return { success: false, data: [] };
         }
-    });
-
-    if (!response.ok) {
-        if (response.status === 404) {
-            return []; // No hay pedidos pendientes
-        }
-        throw new Error('No se pudieron cargar los pedidos de cocina.');
+        
+        // Destructuración de objetos para transformar datos
+        const pedidosAgrupados = response.map(({ nombrePlatillo, cantidadTotal, fechaPrimerPedido, idsRelacionados }) => ({
+            nombrePlatillo,
+            cantidadTotal,
+            fechaPrimerPedido: new Date(fechaPrimerPedido),
+            idsRelacionados,
+            tiempoEspera: this.#calcularTiempoEspera(fechaPrimerPedido)
+        }));
+        
+        return { success: true, data: pedidosAgrupados };
     }
 
-    return await response.json();
+    // Método privado para calcular tiempo de espera
+    #calcularTiempoEspera(fecha) {
+        const fechaPedido = new Date(fecha);
+        const ahora = new Date();
+        const diffMin = Math.floor((ahora - fechaPedido) / 60000);
+        
+        if (diffMin < 1) return `${Math.floor((ahora - fechaPedido) / 1000)} seg`;
+        if (diffMin < 60) return `${diffMin} min`;
+        return `${Math.floor(diffMin / 60)}h ${diffMin % 60}m`;
+    }
 }

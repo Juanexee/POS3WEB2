@@ -1,4 +1,5 @@
-// categoriaController.js
+// pages/categorias/categoriaController.js
+
 import { 
     obtenerCategorias,
     insertarCategoria, 
@@ -6,93 +7,119 @@ import {
     eliminarCategoria 
 } from '../../shared/services/categoriaService.js';
 
-let tablaCuerpo, modalCategoria, formCategoria, inputId, inputNombre, btnAbrirAgregar, inputBuscar;
-let listaCompletaCategorias = []; 
+// Variables globales
+let tablaCuerpo;
+let modalCategoria;
+let formCategoria;
+let inputId;
+let inputNombre;
+let btnAbrirAgregar;
+let inputBuscar;
+let listaCompletaCategorias = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     inicializarModuloCategorias();
 });
 
 function inicializarModuloCategorias() {
-    tablaCuerpo = document.querySelector('#tabla-categorias tbody') || document.querySelector('table tbody');
+    // Obtener elementos del DOM
+    tablaCuerpo = document.querySelector('#tabla-categorias tbody');
     modalCategoria = document.getElementById('modal-categoria');
     formCategoria = document.getElementById('form-categoria');
     inputId = document.getElementById('categoria-id');
     inputNombre = document.getElementById('nombre-categoria');
-    btnAbrirAgregar = document.getElementById('btn-agregar-platillo'); 
+    btnAbrirAgregar = document.getElementById('btn-agregar-platillo');
     inputBuscar = document.querySelector('.input-busqueda input') || document.getElementById('input-buscar-categoria');
 
-    // Abrir modal para insertar (+)
+    // Evento: Abrir modal para agregar
     if (btnAbrirAgregar) {
         btnAbrirAgregar.addEventListener('click', (e) => {
             e.preventDefault();
             if (formCategoria) formCategoria.reset();
-            if (inputId) inputId.value = ""; // Vacío indica que es una nueva inserción
+            if (inputId) inputId.value = "";
+            
             const tituloModal = modalCategoria.querySelector('.modal-header h3');
             if (tituloModal) tituloModal.textContent = "Agregar Categoría";
+            
             modalCategoria.style.display = 'flex';
         });
     }
 
-    // Botón Salir del modal
-    const btnSalir = document.querySelector('.btn-salir');
+    // Evento: Botón Salir del modal
+    const btnSalir = modalCategoria?.querySelector('.btn-salir');
     if (btnSalir) {
         btnSalir.addEventListener('click', () => {
             modalCategoria.style.display = 'none';
         });
     }
 
-    // Manejo del Submit del Formulario (Guardar / Modificar)
+    // Evento: Submit del formulario
     if (formCategoria) {
         formCategoria.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const id = inputId.value;
+            const id = inputId?.value;
             const payload = {
-                nombre: inputNombre.value.trim()
+                nombre: inputNombre?.value.trim()
             };
+
+            if (!payload.nombre) {
+                alert('El nombre de la categoría es requerido');
+                return;
+            }
 
             try {
                 if (id) {
-                    // Si hay un ID, se ejecuta la actualización
                     await actualizarCategoria(id, payload);
-                    alert('Categoría actualizada con éxito.');
+                    alert('✅ Categoría actualizada con éxito.');
                 } else {
-                    // Si no hay ID, se registra una nueva
                     await insertarCategoria(payload);
-                    alert('Categoría guardada con éxito.');
+                    alert('✅ Categoría guardada con éxito.');
                 }
+                
                 modalCategoria.style.display = 'none';
-                cargarDatosEnTabla(); // Recargar la lista
+                await cargarDatosEnTabla();
+                
             } catch (error) {
+                console.error('Error:', error);
                 alert(`⚠️ Error al procesar la operación: ${error.message}`);
             }
         });
     }
 
-    // Evento de búsqueda en tiempo real
-    if (inputBuscar) {
-        inputBuscar.addEventListener('input', (e) => {
-            filtrarYMostrarTablas(e.target.value.toLowerCase().trim());
+    // Evento: Cerrar modal al hacer clic fuera
+    if (modalCategoria) {
+        modalCategoria.addEventListener('click', (e) => {
+            if (e.target === modalCategoria) {
+                modalCategoria.style.display = 'none';
+            }
         });
     }
 
-    // Cargar los datos iniciales
+    // Evento: Búsqueda en tiempo real
+    if (inputBuscar) {
+        inputBuscar.addEventListener('input', (e) => {
+            const texto = e.target.value.toLowerCase().trim();
+            filtrarYMostrarTablas(texto);
+        });
+    }
+
+    // Cargar datos iniciales
     cargarDatosEnTabla();
 }
 
 async function cargarDatosEnTabla() {
+    if (!tablaCuerpo) return;
+    
     try {
-        if (tablaCuerpo) {
-            tablaCuerpo.innerHTML = '<tr><td colspan="3" style="text-align:center;">Cargando categorías...</td></tr>';
-        }
+        tablaCuerpo.innerHTML = '<tr><td colspan="3" style="text-align:center;">Cargando categorías...</td></tr>';
+        
         listaCompletaCategorias = await obtenerCategorias();
         renderizarFilas(listaCompletaCategorias);
+        
     } catch (error) {
-        console.error(error);
-        if (tablaCuerpo) {
-            tablaCuerpo.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#dc3545;">⚠️ ${error.message}</td></tr>`;
-        }
+        console.error('Error cargando categorías:', error);
+        tablaCuerpo.innerHTML = `<td><td colspan="3" style="text-align:center; color:#dc3545;">⚠️ ${error.message}</td></tr>`;
     }
 }
 
@@ -100,45 +127,48 @@ function renderizarFilas(categorias) {
     if (!tablaCuerpo) return;
     tablaCuerpo.innerHTML = '';
 
-    if (categorias.length === 0) {
+    if (!categorias || categorias.length === 0) {
         tablaCuerpo.innerHTML = '<tr><td colspan="3" style="text-align:center;">No se encontraron categorías.</td></tr>';
         return;
     }
 
     categorias.forEach((cat, index) => {
-        const currentID = cat.categoriaID || cat.id || cat.CategoriaID;
-        const currentNombre = cat.nombre || cat.Nombre;
+        const currentID = cat.categoriaID;
+        const currentNombre = cat.nombre;
 
         const fila = document.createElement('tr');
         fila.innerHTML = `
             <td>${index + 1}</td>
-            <td>${currentNombre}</td>
+            <td>${escapeHtml(currentNombre)}</td>
             <td style="text-align: right; padding-right: 30px;">
-                <button class="btn-edit" title="Editar" style="margin-right: 8px; cursor: pointer;">✏️</button>
-                <button class="btn-delete" title="Eliminar" style="cursor: pointer;">🗑️</button>
+                <button class="btn-edit" data-id="${currentID}" data-nombre="${currentNombre}" title="Editar" style="margin-right: 8px; cursor: pointer;">✏️</button>
+                <button class="btn-delete" data-id="${currentID}" data-nombre="${currentNombre}" title="Eliminar" style="cursor: pointer;">🗑️</button>
             </td>
         `;
 
-        // Evento Editar: Rellena el mismo modal con los datos existentes
-        fila.querySelector('.btn-edit').addEventListener('click', () => {
+        // Evento Editar
+        const btnEdit = fila.querySelector('.btn-edit');
+        btnEdit.addEventListener('click', () => {
             if (formCategoria) formCategoria.reset();
-            inputId.value = currentID;
-            inputNombre.value = currentNombre;
+            if (inputId) inputId.value = currentID;
+            if (inputNombre) inputNombre.value = currentNombre;
             
-            const tituloModal = modalCategoria.querySelector('.modal-header h3');
+            const tituloModal = modalCategoria?.querySelector('.modal-header h3');
             if (tituloModal) tituloModal.textContent = "Editar Categoría";
             
-            modalCategoria.style.display = 'flex';
+            if (modalCategoria) modalCategoria.style.display = 'flex';
         });
 
-        // Evento Eliminar directo al Backend
-        fila.querySelector('.btn-delete').addEventListener('click', async () => {
-            if (confirm(`¿Estás seguro que deseas eliminar o dar de baja la categoría "${currentNombre}"?`)) {
+        // Evento Eliminar
+        const btnDelete = fila.querySelector('.btn-delete');
+        btnDelete.addEventListener('click', async () => {
+            if (confirm(`¿Estás seguro que deseas eliminar la categoría "${currentNombre}"?`)) {
                 try {
                     await eliminarCategoria(currentID);
-                    alert('Operación procesada correctamente.');
-                    cargarDatosEnTabla();
+                    alert('✅ Categoría eliminada/desactivada correctamente.');
+                    await cargarDatosEnTabla();
                 } catch (error) {
+                    console.error('Error:', error);
                     alert(`⚠️ No se pudo eliminar: ${error.message}`);
                 }
             }
@@ -149,9 +179,21 @@ function renderizarFilas(categorias) {
 }
 
 function filtrarYMostrarTablas(texto) {
-    const filtradas = listaCompletaCategorias.filter(cat => {
-        const nombre = (cat.nombre || cat.Nombre || '').toLowerCase();
-        return nombre.includes(texto);
-    });
+    if (!texto) {
+        renderizarFilas(listaCompletaCategorias);
+        return;
+    }
+    
+    const filtradas = listaCompletaCategorias.filter(cat => 
+        cat.nombre && cat.nombre.toLowerCase().includes(texto)
+    );
     renderizarFilas(filtradas);
+}
+
+// Función para escapar HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }

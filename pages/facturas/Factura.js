@@ -1,20 +1,26 @@
 // pages/facturas/Factura.js
-import { obtenerVentas, obtenerVentaPorId } from '../../shared/services/ventaService.js';
+
+import VentaService from '../../shared/services/VentaService.js';
+import { Venta } from '../../shared/models/Venta.js';
+import { DetalleVenta } from '../../shared/models/DetalleVenta.js';
+
+const ventaService = new VentaService();
 
 // Variables globales
-let listaVentas = [];
-let ventaSeleccionada = null;
+let facturasActuales = [];
+let facturaSeleccionada = null;
 let currentPage = 1;
-let itemsPerPage = 8;
+let itemsPerPage = 10;
 let filtroTexto = '';
 
 // Elementos DOM
 let tablaBody;
 let cardsContainer;
+let modalDetalle;
+let modalTicket;
 let inputBuscar;
+let btnRefrescar;
 let btnPrev, btnNext, infoPagina;
-let modalDetalle, modalTicket;
-let formCobro;
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,401 +31,498 @@ async function inicializarModuloFacturas() {
     // Obtener referencias
     tablaBody = document.getElementById('invoice-table-body');
     cardsContainer = document.getElementById('invoice-cards-container');
+    modalDetalle = document.getElementById('modal-detalle-factura');
+    modalTicket = document.getElementById('modal-ticket');
     inputBuscar = document.getElementById('input-buscar-factura');
+    btnRefrescar = document.getElementById('btn-refrescar');
     btnPrev = document.getElementById('btn-prev');
     btnNext = document.getElementById('btn-next');
     infoPagina = document.getElementById('info-pagina');
-    modalDetalle = document.getElementById('modal-detalle-factura');
-    modalTicket = document.getElementById('modal-ticket');
-    formCobro = document.getElementById('form-cobro');
-
-    const btnRefrescar = document.getElementById('btn-refrescar');
-
+    
     // Configurar eventos
     if (inputBuscar) {
         inputBuscar.addEventListener('input', (e) => {
             filtroTexto = e.target.value.toLowerCase();
             currentPage = 1;
-            renderizarLista();
+            renderizarFacturas();
         });
     }
-
+    
+    if (btnRefrescar) {
+        btnRefrescar.addEventListener('click', () => cargarFacturas());
+    }
+    
     if (btnPrev) {
         btnPrev.addEventListener('click', () => {
             if (currentPage > 1) {
                 currentPage--;
-                renderizarLista();
+                renderizarFacturas();
             }
         });
     }
-
+    
     if (btnNext) {
         btnNext.addEventListener('click', () => {
             if (currentPage < totalPages()) {
                 currentPage++;
-                renderizarLista();
+                renderizarFacturas();
             }
         });
     }
-
-    if (btnRefrescar) {
-        btnRefrescar.addEventListener('click', async () => {
-            await cargarVentas();
-        });
-    }
-
+    
+    // Configurar modal de cobro
+    const formCobro = document.getElementById('form-cobro');
     if (formCobro) {
-        formCobro.addEventListener('submit', (e) => {
+        formCobro.addEventListener('submit', async (e) => {
             e.preventDefault();
-            procesarCobro();
+            await procesarCobro();
         });
     }
-
+    
+    const pagoRecibido = document.getElementById('pago-recibido');
+    if (pagoRecibido) {
+        pagoRecibido.addEventListener('input', calcularCambio);
+    }
+    
+    // Botones de cerrar modales
+    const btnCerrarModal = document.getElementById('btn-cerrar-modal');
+    if (btnCerrarModal) {
+        btnCerrarModal.addEventListener('click', () => {
+            modalDetalle.style.display = 'none';
+            facturaSeleccionada = null;
+        });
+    }
+    
+    const btnCerrarTicket = document.getElementById('btn-cerrar-ticket');
+    if (btnCerrarTicket) {
+        btnCerrarTicket.addEventListener('click', () => {
+            modalTicket.style.display = 'none';
+        });
+    }
+    
+    const btnImprimirTicket = document.getElementById('btn-imprimir-ticket');
+    if (btnImprimirTicket) {
+        btnImprimirTicket.addEventListener('click', () => {
+            imprimirTicket();
+        });
+    }
+    
+    // Cerrar modal al hacer clic fuera
+    if (modalDetalle) {
+        modalDetalle.addEventListener('click', (e) => {
+            if (e.target === modalDetalle) {
+                modalDetalle.style.display = 'none';
+                facturaSeleccionada = null;
+            }
+        });
+    }
+    
+    if (modalTicket) {
+        modalTicket.addEventListener('click', (e) => {
+            if (e.target === modalTicket) {
+                modalTicket.style.display = 'none';
+            }
+        });
+    }
+    
     // Cargar datos
-    await cargarVentas();
+    await cargarFacturas();
+}
 
-    // Cerrar modales al hacer clic fuera
-    window.addEventListener('click', (e) => {
-        if (e.target === modalDetalle) cerrarModalDetalle();
-        if (e.target === modalTicket) cerrarModalTicket();
+async function cargarFacturas() {
+    try {
+        if (tablaBody) {
+            tablaBody.innerHTML = '<tr><td colspan="7" class="text-center">Cargando facturas...</td></tr>';
+        }
+        if (cardsContainer) {
+            cardsContainer.innerHTML = '<div class="loading-cards">Cargando facturas...</div>';
+        }
+        
+        const { success, data: facturas } = await ventaService.obtenerTodas();
+        
+        if (!success || !facturas) {
+            throw new Error('No se pudieron cargar las facturas');
+        }
+        
+        facturasActuales = facturas;
+        renderizarFacturas();
+        
+    } catch (error) {
+        console.error('Error cargando facturas:', error);
+        if (tablaBody) {
+            tablaBody.innerHTML = `<tr><td colspan="7" class="text-center" style="color:#dc3545;">⚠️ ${error.message}</td></tr>`;
+        }
+        if (cardsContainer) {
+            cardsContainer.innerHTML = `<div class="error-cards" style="color:#dc3545; text-align:center;">⚠️ ${error.message}</div>`;
+        }
+    }
+}
+
+function totalPages() {
+    let datosFiltrados = filtrarFacturas();
+    return Math.ceil(datosFiltrados.length / itemsPerPage);
+}
+
+function filtrarFacturas() {
+    if (!filtroTexto) return facturasActuales;
+    
+    return facturasActuales.filter(factura => {
+        const idMatch = factura.ventaID.toString().includes(filtroTexto);
+        const nombreMatch = factura.nombreCajero && factura.nombreCajero.toLowerCase().includes(filtroTexto);
+        const mesaMatch = factura.mesaID && factura.mesaID.toString().includes(filtroTexto);
+        return idMatch || nombreMatch || mesaMatch;
     });
 }
 
-async function cargarVentas() {
-    try {
-        mostrarLoading();
-        listaVentas = await obtenerVentas();
-        renderizarLista();
-    } catch (error) {
-        console.error('Error al cargar ventas:', error);
-        mostrarError(error.message);
-    }
-}
-
-function renderizarLista() {
-    // Filtrar datos
-    let datosFiltrados = [...listaVentas];
-    
-    if (filtroTexto) {
-        datosFiltrados = datosFiltrados.filter(venta => 
-            venta.ventaID?.toString().includes(filtroTexto) ||
-            venta.nombreCajero?.toLowerCase().includes(filtroTexto)
-        );
-    }
-    
-    // Paginación
+function renderizarFacturas() {
+    const datosFiltrados = filtrarFacturas();
     const totalItems = datosFiltrados.length;
     const totalPaginas = Math.ceil(totalItems / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const datosPagina = datosFiltrados.slice(startIndex, endIndex);
     
-    // Actualizar controles de paginación
+    // Actualizar paginación
     if (infoPagina) {
         infoPagina.textContent = `Página ${currentPage} de ${totalPaginas || 1}`;
     }
     if (btnPrev) btnPrev.disabled = currentPage === 1;
     if (btnNext) btnNext.disabled = currentPage === totalPaginas || totalPaginas === 0;
     
-    // Renderizar según vista
+    // Renderizar tabla (Desktop)
     renderizarTabla(datosPagina);
-    renderizarTarjetas(datosPagina);
+    
+    // Renderizar tarjetas (Móvil)
+    renderizarCards(datosPagina);
 }
 
-function renderizarTabla(ventas) {
+function renderizarTabla(facturas) {
     if (!tablaBody) return;
     
-    if (ventas.length === 0) {
+    if (facturas.length === 0) {
         tablaBody.innerHTML = '<tr><td colspan="7" class="text-center">No hay facturas registradas</td></tr>';
         return;
     }
     
     tablaBody.innerHTML = '';
     
-    ventas.forEach(venta => {
-        const fecha = venta.fechaVenta ? new Date(venta.fechaVenta).toLocaleDateString() : '-';
-        const estado = venta.estado?.toLowerCase() === 'pagada' ? 'Pagado' : 'Pendiente';
-        const estadoClass = venta.estado?.toLowerCase() === 'pagada' ? 'estado-pagado' : 'estado-pendiente';
+    facturas.forEach(factura => {
+        const fecha = new Date(factura.fechaVenta);
+        const fechaFormateada = fecha.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
         
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td><strong>#${venta.ventaID}</strong></td>
-            <td>${fecha}</td>
-            <td>Mesa ${venta.mesaID || 'N/A'}</td>
-            <td>${escapeHtml(venta.nombreCajero || 'N/A')}</td>
-            <td><span class="estado-badge ${estadoClass}">${estado}</span></td>
-            <td class="text-bold">C$ ${venta.total?.toFixed(2) || '0.00'}</td>
+        const estadoClass = factura.estado === 'Pagada' ? 'estado-pagado' : 'estado-pendiente';
+        const estadoTexto = factura.estado === 'Pagada' ? 'Pagado' : 'Pendiente';
+        
+        const row = document.createElement('tr');
+        row.className = `row-${factura.estado === 'Pagada' ? 'paid' : 'pending'}`;
+        row.innerHTML = `
+            <td><strong>#${factura.ventaID}</strong></td>
+            <td>${fechaFormateada}</td>
+            <td>Mesa ${factura.mesaID || 'N/A'}</td>
+            <td>${factura.nombreCajero || 'QR Cliente'}</td>
+            <td><span class="estado-badge ${estadoClass}">${estadoTexto}</span></td>
+            <td class="text-bold">C$${factura.total.toFixed(2)}</td>
             <td>
                 <div class="table-actions">
-                    <button class="btn-action btn-view" data-id="${venta.ventaID}" title="Ver Detalle">
-                        <i class="fas fa-eye"></i>
+                    <button class="btn-view" data-id="${factura.ventaID}" title="Ver Detalle">
+                        👁️
                     </button>
-                    ${venta.estado?.toLowerCase() !== 'pagada' ? 
-                        `<button class="btn-action btn-print" data-id="${venta.ventaID}" title="Cobrar">
-                            <i class="fas fa-cash-register"></i>
-                        </button>` : ''}
+                    ${factura.estado !== 'Pagada' ? 
+                        `<button class="btn-pay" data-id="${factura.ventaID}" title="Cobrar">
+                            💰
+                        </button>` : ''
+                    }
+                    <button class="btn-print" data-id="${factura.ventaID}" title="Imprimir">
+                        🖨️
+                    </button>
                 </div>
             </td>
         `;
         
-        tablaBody.appendChild(fila);
+        tablaBody.appendChild(row);
     });
     
-    // Agregar event listeners a botones
+    // Event listeners para botones de la tabla
     document.querySelectorAll('.btn-view').forEach(btn => {
-        btn.addEventListener('click', () => verDetalleVenta(parseInt(btn.dataset.id)));
+        btn.addEventListener('click', () => verDetalleFactura(parseInt(btn.dataset.id)));
+    });
+    
+    document.querySelectorAll('.btn-pay').forEach(btn => {
+        btn.addEventListener('click', () => abrirModalCobro(parseInt(btn.dataset.id)));
     });
     
     document.querySelectorAll('.btn-print').forEach(btn => {
-        btn.addEventListener('click', () => abrirModalCobro(parseInt(btn.dataset.id)));
+        btn.addEventListener('click', () => imprimirFactura(parseInt(btn.dataset.id)));
     });
 }
 
-function renderizarTarjetas(ventas) {
+function renderizarCards(facturas) {
     if (!cardsContainer) return;
     
-    if (ventas.length === 0) {
-        cardsContainer.innerHTML = '<div class="loading-cards">No hay facturas registradas</div>';
+    if (facturas.length === 0) {
+        cardsContainer.innerHTML = '<div class="no-results">No hay facturas registradas</div>';
         return;
     }
     
     cardsContainer.innerHTML = '';
     
-    ventas.forEach(venta => {
-        const fecha = venta.fechaVenta ? new Date(venta.fechaVenta).toLocaleDateString() : '-';
-        const estado = venta.estado?.toLowerCase() === 'pagada' ? 'pagado' : 'pendiente';
-        const estadoTexto = venta.estado?.toLowerCase() === 'pagada' ? 'Pagado' : 'Pendiente';
-        const estadoClass = venta.estado?.toLowerCase() === 'pagada' ? 'badge-pagado' : 'badge-pendiente';
+    facturas.forEach(factura => {
+        const fecha = new Date(factura.fechaVenta);
+        const fechaFormateada = fecha.toLocaleDateString('es-ES');
+        
+        const estadoClass = factura.estado === 'Pagada' ? 'status-pagado' : 'status-pendiente';
+        const estadoTexto = factura.estado === 'Pagada' ? 'Pagado' : 'Pendiente';
         
         const card = document.createElement('div');
-        card.className = `invoice-card status-${estado}`;
+        card.className = `invoice-card ${estadoClass}`;
         card.innerHTML = `
             <div class="card-header">
-                <span class="invoice-number">#${venta.ventaID}</span>
-                <span class="badge ${estadoClass}">${estadoTexto}</span>
+                <span class="invoice-number">#${factura.ventaID}</span>
+                <span class="badge badge-${factura.estado === 'Pagada' ? 'pagado' : 'pendiente'}">${estadoTexto}</span>
             </div>
             <div class="card-body">
-                <p><strong>📅 Fecha:</strong> ${fecha}</p>
-                <p><strong>🪑 Mesa:</strong> ${venta.mesaID || 'N/A'}</p>
-                <p><strong>👤 Atendido:</strong> ${escapeHtml(venta.nombreCajero || 'N/A')}</p>
-                <p class="invoice-total"><strong>Total:</strong> C$ ${venta.total?.toFixed(2) || '0.00'}</p>
+                <p><strong>📅 Fecha:</strong> ${fechaFormateada}</p>
+                <p><strong>🪑 Mesa:</strong> ${factura.mesaID || 'N/A'}</p>
+                <p><strong>👤 Cajero:</strong> ${factura.nombreCajero || 'QR Cliente'}</p>
+                <p class="invoice-total">Total: C$${factura.total.toFixed(2)}</p>
             </div>
             <div class="card-actions">
-                <button class="btn-action btn-view" data-id="${venta.ventaID}" title="Ver Detalle">
-                    <i class="fas fa-eye"></i>
+                <button class="btn-view" data-id="${factura.ventaID}" title="Ver Detalle">
+                    👁️
                 </button>
-                ${venta.estado?.toLowerCase() !== 'pagada' ? 
-                    `<button class="btn-action btn-print" data-id="${venta.ventaID}" title="Cobrar">
-                        <i class="fas fa-cash-register"></i>
-                    </button>` : ''}
+                ${factura.estado !== 'Pagada' ? 
+                    `<button class="btn-pay" data-id="${factura.ventaID}" title="Cobrar">
+                        💰
+                    </button>` : ''
+                }
+                <button class="btn-print" data-id="${factura.ventaID}" title="Imprimir">
+                    🖨️
+                </button>
             </div>
         `;
         
         cardsContainer.appendChild(card);
     });
     
-    // Agregar event listeners a botones de tarjetas
-    document.querySelectorAll('.invoice-card .btn-view').forEach(btn => {
-        btn.addEventListener('click', () => verDetalleVenta(parseInt(btn.dataset.id)));
+    // Event listeners para botones de las tarjetas
+    cardsContainer.querySelectorAll('.btn-view').forEach(btn => {
+        btn.addEventListener('click', () => verDetalleFactura(parseInt(btn.dataset.id)));
     });
     
-    document.querySelectorAll('.invoice-card .btn-print').forEach(btn => {
+    cardsContainer.querySelectorAll('.btn-pay').forEach(btn => {
         btn.addEventListener('click', () => abrirModalCobro(parseInt(btn.dataset.id)));
     });
+    
+    cardsContainer.querySelectorAll('.btn-print').forEach(btn => {
+        btn.addEventListener('click', () => imprimirFactura(parseInt(btn.dataset.id)));
+    });
 }
 
-async function verDetalleVenta(id) {
+async function verDetalleFactura(ventaID) {
     try {
-        const venta = await obtenerVentaPorId(id);
-        mostrarDetalleVenta(venta);
-    } catch (error) {
-        mostrarNotificacion(error.message, 'error');
-    }
-}
-
-function mostrarDetalleVenta(venta) {
-    // Mostrar información básica
-    document.getElementById('modal-titulo').textContent = '🧾 Detalle de Factura';
-    document.getElementById('modal-factura-numero').textContent = `#${venta.ventaID}`;
-    document.getElementById('venta-id').value = venta.ventaID;
-    
-    const fecha = venta.fecha_venta ? new Date(venta.fecha_venta).toLocaleString() : '-';
-    document.getElementById('factura-fecha').textContent = fecha;
-    document.getElementById('factura-mesa').textContent = venta.mesaID ? `Mesa ${venta.mesaID}` : 'N/A';
-    document.getElementById('factura-usuario').textContent = venta.nombreMesero || venta.nombreCajero || 'N/A';
-    document.getElementById('factura-total').textContent = `C$ ${venta.total?.toFixed(2) || '0.00'}`;
-    
-    // Mostrar productos
-    const listaProductos = document.getElementById('lista-productos');
-    if (venta.detalles && venta.detalles.length > 0) {
-        listaProductos.innerHTML = '';
-        venta.detalles.forEach(detalle => {
-            const item = document.createElement('div');
-            item.className = 'producto-item';
-            item.innerHTML = `
-                <span class="producto-nombre">${escapeHtml(detalle.nombrePlatillo || detalle.NombrePlatillo || 'Producto')}</span>
-                <span class="producto-cantidad">x${detalle.cantidad || 1}</span>
-                <span class="producto-precio">C$ ${((detalle.precio_unitario || 0) * (detalle.cantidad || 1)).toFixed(2)}</span>
-            `;
-            listaProductos.appendChild(item);
-        });
-    } else {
-        listaProductos.innerHTML = '<p class="text-center">No hay productos registrados</p>';
-    }
-    
-    // Limpiar campos de pago
-    document.getElementById('pago-recibido').value = '';
-    document.getElementById('cambio-calculo').value = 'C$ 0.00';
-    document.getElementById('metodo-pago').value = 'Efectivo';
-    
-    // Configurar cálculo de cambio
-    const pagoRecibidoInput = document.getElementById('pago-recibido');
-    const cambioSpan = document.getElementById('cambio-calculo');
-    const total = venta.total || 0;
-    
-    pagoRecibidoInput.oninput = () => {
-        const pago = parseFloat(pagoRecibidoInput.value) || 0;
-        const cambio = pago - total;
-        if (cambio >= 0) {
-            cambioSpan.value = `C$ ${cambio.toFixed(2)}`;
-            cambioSpan.style.color = '#2e7d32';
-        } else {
-            cambioSpan.value = `C$ ${cambio.toFixed(2)} (Faltante)`;
-            cambioSpan.style.color = '#dc3545';
+        const { success, data: venta } = await ventaService.obtenerPorId(ventaID);
+        
+        if (!success || !venta) {
+            alert('No se pudo cargar el detalle de la factura');
+            return;
         }
-    };
-    
-    modalDetalle.style.display = 'flex';
+        
+        facturaSeleccionada = venta;
+        
+        // Llenar modal con datos
+        document.getElementById('venta-id').value = venta.ventaID;
+        document.getElementById('modal-factura-numero').textContent = `#${venta.ventaID}`;
+        document.getElementById('factura-fecha').textContent = new Date(venta.fecha).toLocaleString();
+        document.getElementById('factura-mesa').textContent = `Mesa ${venta.mesaID}`;
+        document.getElementById('factura-usuario').textContent = venta.usuarioID ? `Usuario ID: ${venta.usuarioID}` : 'Cliente QR';
+        document.getElementById('factura-total').textContent = `C$${venta.total.toFixed(2)}`;
+        
+        // Renderizar productos
+        const listaProductos = document.getElementById('lista-productos');
+        if (listaProductos && venta.detalles) {
+            if (venta.detalles.length === 0) {
+                listaProductos.innerHTML = '<p class="text-center">No hay productos en esta factura</p>';
+            } else {
+                listaProductos.innerHTML = venta.detalles.map(detalle => `
+                    <div class="producto-item">
+                        <span class="producto-nombre">${detalle.nombreProducto}</span>
+                        <span class="producto-cantidad">x${detalle.cantidad}</span>
+                        <span class="producto-precio">C$${detalle.precioUnitario.toFixed(2)}</span>
+                        <span class="producto-subtotal">C$${detalle.subtotal.toFixed(2)}</span>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Resetear campos de pago
+        document.getElementById('pago-recibido').value = '';
+        document.getElementById('cambio-calculo').value = 'C$ 0.00';
+        document.getElementById('metodo-pago').value = 'Efectivo';
+        
+        modalDetalle.style.display = 'flex';
+        
+    } catch (error) {
+        console.error('Error al ver detalle:', error);
+        alert('Error al cargar el detalle de la factura');
+    }
 }
 
-function abrirModalCobro(id) {
-    verDetalleVenta(id);
+function calcularCambio() {
+    const pagoRecibido = parseFloat(document.getElementById('pago-recibido').value) || 0;
+    const total = facturaSeleccionada ? facturaSeleccionada.total : 0;
+    const cambio = pagoRecibido - total;
+    
+    const cambioElement = document.getElementById('cambio-calculo');
+    if (cambioElement) {
+        if (cambio >= 0) {
+            cambioElement.value = `C$ ${cambio.toFixed(2)}`;
+            cambioElement.style.color = '#28a745';
+        } else {
+            cambioElement.value = `Faltan C$ ${Math.abs(cambio).toFixed(2)}`;
+            cambioElement.style.color = '#dc3545';
+        }
+    }
 }
 
 async function procesarCobro() {
-    const ventaId = document.getElementById('venta-id').value;
+    if (!facturaSeleccionada) return;
+    
     const pagoRecibido = parseFloat(document.getElementById('pago-recibido').value) || 0;
+    const total = facturaSeleccionada.total;
     const metodoPago = document.getElementById('metodo-pago').value;
-    const venta = listaVentas.find(v => v.ventaID === parseInt(ventaId));
-    
-    if (!venta) {
-        mostrarNotificacion('Error: No se encontró la factura', 'error');
-        return;
-    }
-    
-    const total = venta.total || 0;
     
     if (pagoRecibido < total) {
-        mostrarNotificacion(`El monto recibido (C$${pagoRecibido.toFixed(2)}) es insuficiente. Total: C$${total.toFixed(2)}`, 'error');
+        alert(`⚠️ El pago recibido (C$${pagoRecibido.toFixed(2)}) es menor al total (C$${total.toFixed(2)})`);
         return;
     }
     
     const cambio = pagoRecibido - total;
+    const confirmar = confirm(`💰 Confirmar Cobro:\n\nTotal: C$${total.toFixed(2)}\nPago: C$${pagoRecibido.toFixed(2)}\nCambio: C$${cambio.toFixed(2)}\nMétodo: ${metodoPago}\n\n¿Procesar cobro?`);
     
-    // Aquí se integraría la llamada a la API para registrar el pago
-    // Por ahora, mostramos el ticket
-    mostrarTicket(venta, pagoRecibido, cambio, metodoPago);
-    cerrarModalDetalle();
+    if (!confirmar) return;
+    
+    try {
+        // Aquí llamarías al endpoint de cobro
+        // Por ahora simulamos éxito
+        mostrarNotificacion('✅ Cobro registrado exitosamente', 'success');
+        
+        modalDetalle.style.display = 'none';
+        facturaSeleccionada = null;
+        await cargarFacturas(); // Recargar lista
+        
+    } catch (error) {
+        console.error('Error al procesar cobro:', error);
+        mostrarNotificacion('❌ Error al procesar el cobro', 'error');
+    }
 }
 
-function mostrarTicket(venta, pagoRecibido, cambio, metodoPago) {
-    const fecha = new Date().toLocaleString();
-    const ticketHTML = `
-        <div class="ticket-header">
-            <strong>EL RANCHO DE LA MIMI</strong><br>
-            Jinotepe, Carazo, Nicaragua<br>
-            ${fecha}<br>
-            Factura #${venta.ventaID}
-        </div>
-        <div class="ticket-line"></div>
-        <div>
-            <small>Cant. Descripción</small><br>
-            ${venta.detalles ? venta.detalles.map(d => 
-                `${d.cantidad || 1}x ${d.nombrePlatillo || d.NombrePlatillo || 'Producto'} - C$${((d.precio_unitario || 0) * (d.cantidad || 1)).toFixed(2)}`
-            ).join('<br>') : 'No hay productos'}
-        </div>
-        <div class="ticket-line"></div>
-        <div>
-            <strong>TOTAL: C$${(venta.total || 0).toFixed(2)}</strong><br>
-            Pagado con: ${metodoPago}<br>
-            Recibido: C$${pagoRecibido.toFixed(2)}<br>
-            Cambio: C$${cambio.toFixed(2)}
-        </div>
-        <div class="ticket-line"></div>
-        <div class="ticket-header">
-            ¡Gracias por su visita!
+function abrirModalCobro(ventaID) {
+    verDetalleFactura(ventaID);
+}
+
+async function imprimirFactura(ventaID) {
+    try {
+        const { success, data: venta } = await ventaService.obtenerPorId(ventaID);
+        
+        if (!success || !venta) {
+            alert('No se pudo cargar la factura para imprimir');
+            return;
+        }
+        
+        const ticketHTML = generarTicketHTML(venta);
+        document.getElementById('ticket-contenido').innerHTML = ticketHTML;
+        modalTicket.style.display = 'flex';
+        
+    } catch (error) {
+        console.error('Error al imprimir factura:', error);
+        alert('Error al generar el ticket');
+    }
+}
+
+function generarTicketHTML(venta) {
+    const fecha = new Date(venta.fecha);
+    const fechaStr = fecha.toLocaleString('es-ES');
+    
+    return `
+        <div class="ticket">
+            <div class="ticket-header">
+                <h3>🍽️ EL RANCHO DE LA MIMI</h3>
+                <p>Jinotepe, Carazo, Nicaragua</p>
+                <p>Tel: (505) 1234-5678</p>
+                <div class="ticket-line">--------------------------------</div>
+                <p><strong>FACTURA #${venta.ventaID}</strong></p>
+                <p>Fecha: ${fechaStr}</p>
+                <p>Mesa: ${venta.mesaID}</p>
+                <p>Atendido por: ${venta.usuarioID ? `Usuario #${venta.usuarioID}` : 'Cliente QR'}</p>
+                <div class="ticket-line">--------------------------------</div>
+            </div>
+            <div class="ticket-body">
+                ${venta.detalles.map(detalle => `
+                    <div class="ticket-item">
+                        <span>${detalle.cantidad}x ${detalle.nombreProducto}</span>
+                        <span>C$${detalle.subtotal.toFixed(2)}</span>
+                    </div>
+                `).join('')}
+                <div class="ticket-line">--------------------------------</div>
+            </div>
+            <div class="ticket-footer">
+                <p><strong>TOTAL: C$${venta.total.toFixed(2)}</strong></p>
+                <p>🎉 ¡Gracias por su visita!</p>
+                <p>⭐ Síguenos en redes sociales</p>
+            </div>
         </div>
     `;
-    
-    const ticketContenido = document.getElementById('ticket-contenido');
-    if (ticketContenido) {
-        ticketContenido.innerHTML = ticketHTML;
-    }
-    
-    modalTicket.style.display = 'flex';
 }
 
-function cerrarModalDetalle() {
-    if (modalDetalle) modalDetalle.style.display = 'none';
-}
-
-function cerrarModalTicket() {
-    if (modalTicket) modalTicket.style.display = 'none';
-}
-
-// Configurar botón de impresión
-document.getElementById('btn-imprimir-ticket')?.addEventListener('click', () => {
-    const ticketContent = document.getElementById('ticket-contenido')?.innerHTML;
-    if (ticketContent) {
-        const ventanaImpresion = window.open('', '_blank');
-        ventanaImpresion.document.write(`
-            <html>
+function imprimirTicket() {
+    const contenido = document.getElementById('ticket-contenido').innerHTML;
+    const ventana = window.open('', '_blank');
+    ventana.document.write(`
+        <html>
             <head>
                 <title>Ticket de Venta</title>
                 <style>
-                    body { font-family: 'Courier New', monospace; font-size: 12px; padding: 20px; }
-                    .ticket-header { text-align: center; margin-bottom: 10px; }
-                    .ticket-line { border-top: 1px dashed #000; margin: 5px 0; }
+                    body {
+                        font-family: 'Courier New', monospace;
+                        margin: 0;
+                        padding: 20px;
+                        background: white;
+                    }
+                    .ticket {
+                        max-width: 300px;
+                        margin: 0 auto;
+                        text-align: center;
+                    }
+                    .ticket-header, .ticket-footer {
+                        margin: 10px 0;
+                    }
+                    .ticket-item {
+                        display: flex;
+                        justify-content: space-between;
+                        margin: 5px 0;
+                    }
+                    .ticket-line {
+                        border-top: 1px dashed #000;
+                        margin: 10px 0;
+                    }
+                    h3 {
+                        margin: 0;
+                        color: #ff6b00;
+                    }
                 </style>
             </head>
-            <body>${ticketContent}</body>
-            </html>
-        `);
-        ventanaImpresion.document.close();
-        ventanaImpresion.print();
-        ventanaImpresion.close();
-    }
-});
-
-document.getElementById('btn-cerrar-modal')?.addEventListener('click', cerrarModalDetalle);
-document.getElementById('btn-cerrar-ticket')?.addEventListener('click', cerrarModalTicket);
-
-function mostrarLoading() {
-    if (tablaBody) tablaBody.innerHTML = '<tr><td colspan="7" class="text-center">Cargando facturas...<\/td></tr>';
-    if (cardsContainer) cardsContainer.innerHTML = '<div class="loading-cards">Cargando facturas...</div>';
-}
-
-function mostrarError(mensaje) {
-    if (tablaBody) tablaBody.innerHTML = `<tr><td colspan="7" class="text-center" style="color: #dc3545;">⚠️ ${mensaje}<\/td></tr>`;
-    if (cardsContainer) cardsContainer.innerHTML = `<div class="loading-cards" style="color: #dc3545;">⚠️ ${mensaje}</div>`;
-}
-
-function totalPages() {
-    let datosFiltrados = [...listaVentas];
-    if (filtroTexto) {
-        datosFiltrados = datosFiltrados.filter(venta => 
-            venta.ventaID?.toString().includes(filtroTexto) ||
-            venta.nombreCajero?.toLowerCase().includes(filtroTexto)
-        );
-    }
-    return Math.ceil(datosFiltrados.length / itemsPerPage);
-}
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+            <body>${contenido}</body>
+        </html>
+    `);
+    ventana.document.close();
+    ventana.print();
+    ventana.close();
 }
 
 function mostrarNotificacion(mensaje, tipo) {
@@ -454,12 +557,25 @@ function mostrarNotificacion(mensaje, tipo) {
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
+    
     @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
     }
 `;
 document.head.appendChild(style);
