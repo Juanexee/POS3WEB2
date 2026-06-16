@@ -141,13 +141,13 @@ function renderizarFilas(categorias) {
             <td>${index + 1}</td>
             <td>${escapeHtml(currentNombre)}</td>
             <td style="text-align: right; padding-right: 30px;">
-                <button class="btn-edit" data-id="${currentID}" data-nombre="${currentNombre}" title="Editar" style="margin-right: 8px; cursor: pointer;">✏️</button>
-                <button class="btn-delete" data-id="${currentID}" data-nombre="${currentNombre}" title="Eliminar" style="cursor: pointer;">🗑️</button>
+                <button class="btn-editar" data-id="${currentID}" data-nombre="${currentNombre}">✏️ Editar</button>
+                <button class="btn-desactivar" data-id="${currentID}" data-nombre="${currentNombre}">🔒 Desactivar</button>
             </td>
         `;
 
         // Evento Editar
-        const btnEdit = fila.querySelector('.btn-edit');
+        const btnEdit = fila.querySelector('.btn-editar');
         btnEdit.addEventListener('click', () => {
             if (formCategoria) formCategoria.reset();
             if (inputId) inputId.value = currentID;
@@ -160,7 +160,7 @@ function renderizarFilas(categorias) {
         });
 
         // Evento Eliminar
-        const btnDelete = fila.querySelector('.btn-delete');
+        const btnDelete = fila.querySelector('.btn-desactivar');
         btnDelete.addEventListener('click', async () => {
             if (confirm(`¿Estás seguro que deseas eliminar la categoría "${currentNombre}"?`)) {
                 try {

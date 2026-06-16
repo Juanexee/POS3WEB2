@@ -15,19 +15,18 @@
             <img src="../../shared/images/USER1.png" alt="Usuario">
             <p id="nombre-usuario-actual">user1</p>
         </div>
-
+ 
         <nav>
             <ul>
                 <li><a href="../../pages/admin/inicio.html">🏠 Inicio</a></li>
                 <li><a href="../../pages/categorias/Categoria.html">📁 Categorías</a></li>
                 <li><a href="../../pages/platillos/Platillo.html">🍔 Platillos</a></li>
                 <li><a href="../../pages/mesas/Mesas.html">🪑 Mesas</a></li>
-                <li><a href="../../pages/personal/Personal.html">👥 Personal</a></li>
-           
-                <li><a href="../../pages/cocina/Cocina.html">🍳 Cocina</a></li>
+                <li><a href="../../pages/personal/personal.html">👥 Personal</a></li>
+                <li><a href="../../pages/cocina/cocina.html">🍳 Cocina</a></li>
                 <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
-                     <li><a href="../../pages/roles/Roles.html" class="active">🔐 Roles</a></li>
-                     <li><a href="../../pages/admin/generar-qr.html">📱 Generar QR</a></li>
+                <li><a href="../../pages/Rol/Roles.html" class="active">🔐 Roles</a></li>
+                <li><a href="../../pages/admin/generar-qr.html">📱 Generar QR</a></li>
             </ul>
         </nav>
     </aside>
@@ -42,6 +41,12 @@
         <!-- HERRAMIENTAS -->
         <div class="herramientas">
             <button id="btn-abrir-agregar" class="btn-agregar-top" title="Agregar Rol">+</button>
+
+            <label class="lbl-mostrar-inactivos" style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; color: #555; user-select: none; margin-left: 10px; margin-right: 10px;">
+                <input type="checkbox" id="chk-mostrar-inactivos" style="cursor: pointer;">
+                Mostrar desactivados
+            </label>
+
             <div class="input-busqueda">
                 🔍 <input type="text" id="input-buscar-rol" placeholder="Buscar rol...">
             </div>

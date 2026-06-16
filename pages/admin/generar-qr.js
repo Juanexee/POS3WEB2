@@ -82,7 +82,8 @@ async function generarQRCodes(mesasList) {
     
     for (const mesa of mesasList) {
         const numeroMesa = mesa.numeroMesa || mesa.numero_mesa;
-        const url = `${baseURL}/pages/menu/menu.html?mesa=${numeroMesa}`;
+        const mesaID = mesa.mesaID || mesa.id;
+        const url = `${baseURL}/Prueba_De_Api3/menu.html?mesaID=${mesaID}&numeroMesa=${numeroMesa}`;
         
         const card = document.createElement('div');
         card.className = 'qr-card';

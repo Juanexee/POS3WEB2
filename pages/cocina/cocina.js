@@ -1,6 +1,6 @@
 // pages/cocina/cocina.js
 
-import VentaService from '../../shared/services/VentaService.js';
+import VentaService from '../../shared/services/ventaService.js';
 import SesionService from '../../shared/services/SesionService.js';
 
 const ventaService = new VentaService();
@@ -54,9 +54,30 @@ function renderizarPedidos(pedidos) {
     
     contenedor.innerHTML = '';
     
-    pedidos.forEach(({ nombrePlatillo, cantidadTotal, tiempoEspera, idsRelacionados }) => {
+    pedidos.forEach(({ nombrePlatillo, cantidadTotal, tiempoEspera, idsRelacionados, numerosMesas, estado }) => {
         const alertaClass = getAlertaClass(tiempoEspera);
         
+        let botonesHtml = '';
+        if (estado === 'Preparando') {
+            botonesHtml = `
+                <button class="btn-despachar" disabled style="opacity: 0.6; cursor: not-allowed; background-color: #555; pointer-events: none;">
+                    👨‍🍳 EN PREPARACIÓN
+                </button>
+                <button class="btn-listo" data-ids="${idsRelacionados}" data-nombre="${nombrePlatillo}">
+                    ✅ COMIDA LISTA
+                </button>
+            `;
+        } else {
+            botonesHtml = `
+                <button class="btn-despachar" data-ids="${idsRelacionados}" data-nombre="${nombrePlatillo}">
+                    🍳 ACEPTAR LOTE
+                </button>
+                <button class="btn-listo" disabled style="opacity: 0.5; cursor: not-allowed; pointer-events: none;">
+                    ✅ COMIDA LISTA
+                </button>
+            `;
+        }
+
         const tarjeta = document.createElement('div');
         tarjeta.className = `tarjeta-cocina ${alertaClass}`;
         tarjeta.innerHTML = `
@@ -64,14 +85,12 @@ function renderizarPedidos(pedidos) {
             <div class="kds-cuerpo">
                 <h2>${nombrePlatillo}</h2>
                 <p class="kds-tiempo">${tiempoEspera}</p>
+                <p class="kds-mesas" style="margin-top: 8px; font-weight: bold; color: var(--text-color, #fff);">
+                    🪑 Mesas: ${numerosMesas || 'N/A'}
+                </p>
             </div>
             <div class="kds-footer">
-                <button class="btn-despachar" data-ids="${idsRelacionados}" data-nombre="${nombrePlatillo}">
-                    🍳 ACEPTAR LOTE
-                </button>
-                <button class="btn-listo" data-ids="${idsRelacionados}" data-nombre="${nombrePlatillo}">
-                    ✅ COMIDA LISTA
-                </button>
+                ${botonesHtml}
             </div>
         `;
         
@@ -98,7 +117,7 @@ function getAlertaClass(tiempoEspera) {
 async function aceptarPedido(ids, nombrePlatillo) {
     const idsArray = ids.split(',').map(id => parseInt(id));
     
-    const result = await sesionService.aceptarLote(idsArray, 'EnPreparacion');
+    const result = await sesionService.aceptarLote(idsArray, 'Preparando');
     
     if (result.success !== false) {
         console.log(`✅ Pedido "${nombrePlatillo}" aceptado`);
@@ -111,7 +130,7 @@ async function aceptarPedido(ids, nombrePlatillo) {
 async function marcarListo(ids, nombrePlatillo) {
     const idsArray = ids.split(',').map(id => parseInt(id));
     
-    const result = await sesionService.entregarPedidos(idsArray, 'Listo');
+    const result = await sesionService.aceptarLote(idsArray, 'Listo');
     
     if (result.success !== false) {
         console.log(`✅ Pedido "${nombrePlatillo}" listo`);

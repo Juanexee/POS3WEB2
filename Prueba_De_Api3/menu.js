@@ -1,8 +1,8 @@
 // pages/menu/menu.js
 
-import PlatilloService from '../../shared/services/platilloService.js';
-import CategoriaService from '../../shared/services/categoriaService.js';
-import SesionService from '../../shared/services/SesionService.js';
+import PlatilloService from '../shared/services/platilloService.js';
+import CategoriaService from '../shared/services/categoriaService.js';
+import SesionService from '../shared/services/SesionService.js';
 
 const platilloService = new PlatilloService();
 const categoriaService = new CategoriaService();
@@ -14,16 +14,18 @@ let todasLasCategorias = [];
 // Inicializar sesión por QR
 async function inicializarSesionPorQR() {
     const urlParams = new URLSearchParams(window.location.search);
-    const numeroMesa = urlParams.get('mesa');
+    const mesaIDParam = urlParams.get('mesaID') || urlParams.get('mesa');
+    const numeroMesaParam = urlParams.get('numeroMesa') || urlParams.get('mesa');
     
-    if (numeroMesa) {
+    if (mesaIDParam) {
         try {
-            const resultado = await sesionService.iniciarSesion(parseInt(numeroMesa));
+            const resultado = await sesionService.iniciarSesion(parseInt(mesaIDParam));
             if (resultado.success) {
                 localStorage.setItem('sesionActiva', resultado.data.sesionID);
                 localStorage.setItem('mesaActual', resultado.data.mesaID);
-                mostrarIndicadorMesa(numeroMesa);
-                console.log(`✅ Sesión iniciada para Mesa ${numeroMesa}`);
+                localStorage.setItem('numeroMesaVisual', numeroMesaParam || resultado.data.mesaID);
+                mostrarIndicadorMesa(numeroMesaParam || resultado.data.mesaID);
+                console.log(`✅ Sesión iniciada para Mesa ID ${resultado.data.mesaID} (Número ${numeroMesaParam})`);
             }
         } catch (error) {
             console.error('Error al iniciar sesión:', error);
@@ -69,7 +71,14 @@ async function init() {
         });
         
         todosLosPlatillos = todosLosPlatillos.map(platillo => ({
-            ...platillo,
+            platilloID: platillo.platilloID,
+            nombre: platillo.nombre,
+            descripcion: platillo.descripcion,
+            precio: platillo.precio,
+            precioFormateado: platillo.precioFormateado,
+            categoriaID: platillo.categoriaID,
+            disponible: platillo.disponible,
+            imagenBase64: platillo.imagenBase64,
             nombreCategoria: mapaCategorias.get(platillo.categoriaID) || 'Otros'
         }));
         
@@ -146,7 +155,7 @@ function renderizarMenu(platillos) {
             enlace.className = 'product-link';
             
             const img = document.createElement('img');
-            img.src = platillo.imagenBase64 || '../../shared/images/placeholder.png';
+            img.src = platillo.imagenBase64 || '../shared/images/placeholder.png';
             img.alt = platillo.nombre;
             
             const detalles = document.createElement('div');

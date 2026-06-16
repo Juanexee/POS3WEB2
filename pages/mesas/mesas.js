@@ -35,6 +35,7 @@ async function inicializarModuloMesas() {
     const btnCerrarDetalle = document.getElementById('btn-cerrar-detalle');
     const btnAbrirCambio = document.getElementById('btn-abrir-cambio');
     const btnConfirmarEntrega = document.getElementById('btn-confirmar-entrega');
+    const btnCobrarMesa = document.getElementById('btn-cobrar-mesa');
 
     // Botones de control del Modal Cambio de Mesa
     const btnCancelarCambio = document.getElementById('btn-cancelar-cambio');
@@ -133,37 +134,66 @@ async function inicializarModuloMesas() {
         });
     }
 
-   // 5. Botón "Entrega" (Despachar platos listos de la mesa)
-if (btnConfirmarEntrega) {
-    btnConfirmarEntrega.addEventListener('click', async () => {
-        if (!mesaSeleccionadaActual) return;
-        
-        try {
-            const cantReady = parseInt(document.getElementById('cant-ready').innerText) || 0;
-            if (cantReady === 0) {
-                alert('No hay órdenes marcadas como "listas para servir" en esta mesa.');
-                return;
-            }
-
-            // =========================================================================
-            // PLAN DE PRUEBA: IDs de pedidos ficticios para simular el lote de la base de datos
-            // Reemplaza estos números por IDs reales de tu tabla [Pedidos] que estén en estado 'Listo'
-            // =========================================================================
-            const idsPedidosAEntregar = [1001, 1002]; 
-
-            // Invocamos al servicio corregido pasando el Array
-            const respuesta = await entregarPedidosService(idsPedidosAEntregar);
+    // 5. Botón "Entrega" (Despachar platos listos de la mesa)
+    if (btnConfirmarEntrega) {
+        btnConfirmarEntrega.addEventListener('click', async () => {
+            if (!mesaSeleccionadaActual) return;
             
-            alert(`✅ ${respuesta.message}`); // Muestra el mensaje de éxito de tu capa de negocio
-            modalDetalle.style.display = 'none';
-            await cargarMapaMesas(contenedorGrid);
+            try {
+                const cantReady = parseInt(document.getElementById('cant-ready').innerText) || 0;
+                if (cantReady === 0) {
+                    alert('No hay órdenes marcadas como "listas para servir" en esta mesa.');
+                    return;
+                }
 
-        } catch (error) {
-            // Ahora este catch atrapará correctamente si la API te dice "Denegado..." debido a tus estados en BD
-            alert(`⚠️ Error en entrega: ${error.message}`);
-        }
-    });
-}
+                // =========================================================================
+                // PLAN DE PRUEBA: IDs de pedidos ficticios para simular el lote de la base de datos
+                // Reemplaza estos números por IDs reales de tu tabla [Pedidos] que estén en estado 'Listo'
+                // =========================================================================
+                const idsPedidosAEntregar = [1001, 1002]; 
+
+                // Invocamos al servicio corregido pasando el Array
+                const respuesta = await entregarPedidosService(idsPedidosAEntregar);
+                
+                alert(`✅ ${respuesta.message}`); // Muestra el mensaje de éxito de tu capa de negocio
+                modalDetalle.style.display = 'none';
+                await cargarMapaMesas(contenedorGrid);
+
+            } catch (error) {
+                // Ahora este catch atrapará correctamente si la API te dice "Denegado..." debido a tus estados en BD
+                alert(`⚠️ Error en entrega: ${error.message}`);
+            }
+        });
+    }
+
+    if (btnCobrarMesa) {
+        btnCobrarMesa.addEventListener('click', async () => {
+            if (!mesaSeleccionadaActual) return;
+            const mesaID = mesaSeleccionadaActual.mesaID || mesaSeleccionadaActual.id;
+            
+            try {
+                const response = await fetch(`https://localhost:7081/api/Ventas/activa/mesa/${mesaID}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token_mimi') || localStorage.getItem('authToken') || ''}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'No hay consumo activo para esta mesa.');
+                }
+                
+                const data = await response.json();
+                if (data.success && data.ventaID) {
+                    window.location.href = `../facturas/Factura.html?cobrarVentaId=${data.ventaID}`;
+                } else {
+                    alert('No se encontró una orden activa para esta mesa.');
+                }
+            } catch (error) {
+                alert(`⚠️ Error: ${error.message}`);
+            }
+        });
+    }
 
     // ==========================================
     // COMPORTAMIENTO CONFIGURACIÓN GENERAL MESAS
@@ -306,10 +336,12 @@ function abrirDetalleMesa(mesa) {
     // Bloquear o desbloquear controles si la mesa está libre o sin consumo activo
     const btnAbrirCambio = document.getElementById('btn-abrir-cambio');
     const btnConfirmarEntrega = document.getElementById('btn-confirmar-entrega');
+    const btnCobrarMesa = document.getElementById('btn-cobrar-mesa');
     
     if (estado === 'DISPONIBLE') {
         if(btnAbrirCambio) btnAbrirCambio.style.display = 'none';
         if(btnConfirmarEntrega) btnConfirmarEntrega.style.display = 'none';
+        if(btnCobrarMesa) btnCobrarMesa.style.display = 'none';
         document.getElementById('lista-pedidos-ready').innerHTML = '<li><i>Sin pedidos activos</i></li>';
         document.getElementById('lista-pedidos-kitchen').innerHTML = '<li><i>Sin pedidos activos</i></li>';
         document.getElementById('cant-ready').innerText = '0';
@@ -317,6 +349,7 @@ function abrirDetalleMesa(mesa) {
     } else {
         if(btnAbrirCambio) btnAbrirCambio.style.display = 'inline-block';
         if(btnConfirmarEntrega) btnConfirmarEntrega.style.display = 'inline-block';
+        if(btnCobrarMesa) btnCobrarMesa.style.display = 'inline-block';
         
         inyectarPedidosSimulados();
     }

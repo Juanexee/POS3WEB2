@@ -52,12 +52,18 @@ export default class PlatilloService extends HttpService {
     async actualizar(id, platilloData) {
         // ✅ CORREGIDO: PUT /Platillo/{id}/Actualizar
         const response = await this.put(`${this.endpointBase}/${id}/Actualizar`, platilloData);
+        if (response.success === false) {
+            throw new Error(response.message || 'Error al actualizar el platillo');
+        }
         return response;
     }
 
     async eliminar(id, disponible = false) {
         // ✅ CORREGIDO: PUT /Platillo/{id}/Disponibilidad?disponible=false
         const response = await this.put(`${this.endpointBase}/${id}/Disponibilidad?disponible=${disponible}`);
+        if (response.success === false) {
+            throw new Error(response.message || 'Error al cambiar la disponibilidad');
+        }
         return response;
     }
 }

@@ -21,9 +21,14 @@ let selectCategoria;
 let btnAgregar;
 let inputBuscar;
 let btnCancelar;
+let inputImagen;
+let vistaPreviaImagen;
+let imagenBase64Local = '';
 
 let listaPlatillosLocal = [];
 let listaCategoriasLocal = [];
+let chkMostrarInactivos;
+let platilloEnEdicion = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     inicializarModuloPlatillos();
@@ -42,18 +47,51 @@ async function inicializarModuloPlatillos() {
     btnAgregar = document.getElementById('btn-agregar-platillo');
     inputBuscar = document.getElementById('input-buscar-platillo');
     btnCancelar = document.getElementById('btn-cancelar');
+    inputImagen = document.getElementById('imagen-platillo');
+    vistaPreviaImagen = document.getElementById('vista-previa-platillo');
 
-    // Eventos
+    // Eventos de selección de archivo
+    if (inputImagen) {
+        inputImagen.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imagenBase64Local = event.target.result;
+                    if (vistaPreviaImagen) {
+                        vistaPreviaImagen.src = imagenBase64Local;
+                        vistaPreviaImagen.style.display = 'block';
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
     if (btnAgregar) {
         btnAgregar.addEventListener('click', () => {
             formPlatillo.reset();
             inputId.value = '';
+            platilloEnEdicion = null;
+            imagenBase64Local = '';
+            if (inputImagen) inputImagen.value = '';
+            if (vistaPreviaImagen) {
+                vistaPreviaImagen.src = '';
+                vistaPreviaImagen.style.display = 'none';
+            }
             modalPlatillo.style.display = 'flex';
         });
     }
 
     if (btnCancelar) {
         btnCancelar.addEventListener('click', () => {
+            platilloEnEdicion = null;
+            imagenBase64Local = '';
+            if (inputImagen) inputImagen.value = '';
+            if (vistaPreviaImagen) {
+                vistaPreviaImagen.src = '';
+                vistaPreviaImagen.style.display = 'none';
+            }
             modalPlatillo.style.display = 'none';
         });
     }
@@ -69,6 +107,13 @@ async function inicializarModuloPlatillos() {
         inputBuscar.addEventListener('input', (e) => {
             const texto = e.target.value.toLowerCase();
             filtrarPlatillos(texto);
+        });
+    }
+
+    chkMostrarInactivos = document.getElementById('chk-mostrar-inactivos');
+    if (chkMostrarInactivos) {
+        chkMostrarInactivos.addEventListener('change', () => {
+            filtrarYRenderizar();
         });
     }
 
@@ -110,7 +155,7 @@ async function cargarPlatillos() {
     try {
         const result = await obtenerPlatillos();
         listaPlatillosLocal = result;
-        renderizarTabla(listaPlatillosLocal);
+        filtrarYRenderizar();
     } catch (error) {
         console.error('Error cargando platillos:', error);
         tablaCuerpo.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#dc3545;">⚠️ ${error.message}</td></tr>`;
@@ -145,8 +190,11 @@ function renderizarTabla(platillos) {
                 </span>
             </td>
             <td>
-                <button class="btn-edit" data-id="${platillo.platilloID}">✏️ Editar</button>
-                <button class="btn-delete" data-id="${platillo.platilloID}">🗑️ Eliminar</button>
+                <button class="btn-editar" data-id="${platillo.platilloID}">✏️ Editar</button>
+                ${platillo.disponible 
+                    ? `<button class="btn-desactivar" data-id="${platillo.platilloID}">🔒 Desactivar</button>`
+                    : `<button class="btn-activar" data-id="${platillo.platilloID}">✅ Activar</button>`
+                }
              </td>
         `;
         
@@ -154,7 +202,7 @@ function renderizarTabla(platillos) {
     });
     
     // Eventos de botones
-    document.querySelectorAll('.btn-edit').forEach(btn => {
+    document.querySelectorAll('.btn-editar').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.id);
             const platillo = listaPlatillosLocal.find(p => p.platilloID === id);
@@ -162,12 +210,23 @@ function renderizarTabla(platillos) {
         });
     });
     
-    document.querySelectorAll('.btn-delete').forEach(btn => {
+    document.querySelectorAll('.btn-desactivar').forEach(btn => {
         btn.addEventListener('click', async () => {
             const id = parseInt(btn.dataset.id);
             const platillo = listaPlatillosLocal.find(p => p.platilloID === id);
-            if (platillo && confirm(`¿Eliminar "${platillo.nombre}"?`)) {
-                await manejarEliminarPlatillo(platillo.platilloID);
+            if (platillo && confirm(`¿Estás seguro que deseas desactivar (marcar como agotado) el platillo "${platillo.nombre}"?`)) {
+                await manejarCambiarDisponibilidad(platillo.platilloID, false);
+                await cargarPlatillos();
+            }
+        });
+    });
+
+    document.querySelectorAll('.btn-activar').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const id = parseInt(btn.dataset.id);
+            const platillo = listaPlatillosLocal.find(p => p.platilloID === id);
+            if (platillo && confirm(`¿Deseas activar (marcar como disponible) el platillo "${platillo.nombre}"?`)) {
+                await manejarCambiarDisponibilidad(platillo.platilloID, true);
                 await cargarPlatillos();
             }
         });
@@ -175,19 +234,50 @@ function renderizarTabla(platillos) {
 }
 
 function filtrarPlatillos(texto) {
-    const filtrados = listaPlatillosLocal.filter(p => 
-        p.nombre.toLowerCase().includes(texto) ||
-        (p.descripcion && p.descripcion.toLowerCase().includes(texto))
-    );
+    filtrarYRenderizar();
+}
+
+function filtrarYRenderizar() {
+    const texto = inputBuscar ? inputBuscar.value.toLowerCase().trim() : '';
+    const mostrarInactivos = chkMostrarInactivos ? chkMostrarInactivos.checked : false;
+    
+    let filtrados = [...listaPlatillosLocal];
+    
+    if (!mostrarInactivos) {
+        filtrados = filtrados.filter(p => p.disponible === true);
+    }
+    
+    if (texto) {
+        filtrados = filtrados.filter(p => 
+            p.nombre.toLowerCase().includes(texto) ||
+            (p.descripcion && p.descripcion.toLowerCase().includes(texto))
+        );
+    }
+    
     renderizarTabla(filtrados);
 }
 
 function editarPlatillo(platillo) {
+    platilloEnEdicion = platillo;
     inputId.value = platillo.platilloID;
     inputNombre.value = platillo.nombre;
     inputPrecio.value = platillo.precio;
     inputDescripcion.value = platillo.descripcion || '';
     selectCategoria.value = platillo.categoriaID;
+    
+    // Cargar imagen para edición
+    imagenBase64Local = platillo.imagenBase64 || '';
+    if (inputImagen) inputImagen.value = '';
+    if (vistaPreviaImagen) {
+        if (imagenBase64Local) {
+            vistaPreviaImagen.src = imagenBase64Local;
+            vistaPreviaImagen.style.display = 'block';
+        } else {
+            vistaPreviaImagen.src = '';
+            vistaPreviaImagen.style.display = 'none';
+        }
+    }
+    
     modalPlatillo.style.display = 'flex';
 }
 
@@ -197,7 +287,9 @@ async function guardarPlatillo() {
         nombre: inputNombre.value.trim(),
         descripcion: inputDescripcion.value.trim(),
         precio: parseFloat(inputPrecio.value),
-        categoriaID: parseInt(selectCategoria.value)
+        categoriaID: parseInt(selectCategoria.value),
+        disponible: platilloEnEdicion ? platilloEnEdicion.disponible : true,
+        imagenBase64: imagenBase64Local
     };
     
     if (!payload.nombre) {
@@ -225,6 +317,7 @@ async function guardarPlatillo() {
         }
         
         modalPlatillo.style.display = 'none';
+        platilloEnEdicion = null;
         await cargarPlatillos();
         
     } catch (error) {
@@ -233,12 +326,13 @@ async function guardarPlatillo() {
     }
 }
 
-async function manejarEliminarPlatillo(id) {
+async function manejarCambiarDisponibilidad(id, disponible) {
     try {
-        await eliminarPlatillo(id, false);
-        alert('Platillo eliminado correctamente');
+        await eliminarPlatillo(id, disponible);
+        const accionTexto = disponible ? 'activado' : 'desactivado (marcado como agotado)';
+        alert(`Platillo ${accionTexto} correctamente`);
     } catch (error) {
-        console.error('Error eliminando platillo:', error);
+        console.error('Error cambiando disponibilidad del platillo:', error);
         alert(`Error: ${error.message}`);
     }
 }

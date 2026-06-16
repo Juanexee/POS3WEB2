@@ -13,6 +13,7 @@ let listaRoles = [];
 let currentPage = 1;
 let itemsPerPage = 8;
 let filtroTexto = '';
+let chkMostrarInactivos;
 
 // Elementos DOM
 let tablaBody;
@@ -41,6 +42,14 @@ async function inicializarModuloPersonal() {
     btnPrev = document.getElementById('btn-prev');
     btnNext = document.getElementById('btn-next');
     infoPagina = document.getElementById('info-pagina');
+    chkMostrarInactivos = document.getElementById('chk-mostrar-inactivos');
+
+    if (chkMostrarInactivos) {
+        chkMostrarInactivos.addEventListener('change', () => {
+            currentPage = 1;
+            renderizarTabla();
+        });
+    }
 
     // Configurar eventos
     if (btnAbrirAgregar) {
@@ -129,6 +138,11 @@ function renderizarTabla() {
     // Filtrar datos
     let datosFiltrados = [...listaCompletaPersonal];
     
+    const mostrarInactivos = chkMostrarInactivos ? chkMostrarInactivos.checked : false;
+    if (!mostrarInactivos) {
+        datosFiltrados = datosFiltrados.filter(persona => persona.activo === true);
+    }
+    
     if (filtroTexto) {
         datosFiltrados = datosFiltrados.filter(persona => 
             (persona.nombre && persona.nombre.toLowerCase().includes(filtroTexto)) ||
@@ -180,7 +194,10 @@ function renderizarTabla() {
             <td><span class="estado-badge ${estadoClass}">${estadoTexto}</span></td>
             <td>
                 <button class="btn-editar" data-id="${persona.usuarioID}">✏️ Editar</button>
-                <button class="btn-eliminar" data-id="${persona.usuarioID}">🗑️ Eliminar</button>
+                ${persona.activo 
+                    ? `<button class="btn-desactivar" data-id="${persona.usuarioID}">🔒 Desactivar</button>`
+                    : `<button class="btn-activar" data-id="${persona.usuarioID}">✅ Activar</button>`
+                }
             </td>
         `;
         
@@ -196,17 +213,29 @@ function renderizarTabla() {
         });
     });
     
-    document.querySelectorAll('.btn-eliminar').forEach(btn => {
+    document.querySelectorAll('.btn-desactivar').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.id);
             const persona = listaCompletaPersonal.find(p => p.usuarioID === id);
-            if (persona) confirmarEliminar(persona);
+            if (persona) confirmarCambiarEstado(persona, false);
+        });
+    });
+
+    document.querySelectorAll('.btn-activar').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = parseInt(btn.dataset.id);
+            const persona = listaCompletaPersonal.find(p => p.usuarioID === id);
+            if (persona) confirmarCambiarEstado(persona, true);
         });
     });
 }
 
 function totalPages() {
     let datosFiltrados = [...listaCompletaPersonal];
+    const mostrarInactivos = chkMostrarInactivos ? chkMostrarInactivos.checked : false;
+    if (!mostrarInactivos) {
+        datosFiltrados = datosFiltrados.filter(persona => persona.activo === true);
+    }
     if (filtroTexto) {
         datosFiltrados = datosFiltrados.filter(persona => 
             (persona.nombre && persona.nombre.toLowerCase().includes(filtroTexto)) ||
@@ -292,10 +321,15 @@ async function guardarPersonal() {
     try {
         if (id) {
             // Modo edición
+            const estadoSelect = document.getElementById('per-estado');
+            const activo = estadoSelect ? estadoSelect.value === 'true' : true;
+
             const datosActualizar = {
+                nombreUsuario: nombreUsuario,
                 nombre: nombre,
                 telefono: telefono,
-                rolID: rolID
+                rolID: rolID,
+                activo: activo
             };
             
             // Si se proporcionó contraseña, incluirla
@@ -333,16 +367,29 @@ async function guardarPersonal() {
     }
 }
 
-async function confirmarEliminar(persona) {
-    const confirmar = confirm(`¿Estás seguro de eliminar a "${persona.nombre}"?\n\nEsta acción desactivará su cuenta.`);
+async function confirmarCambiarEstado(persona, activo) {
+    const accionTexto = activo ? 'activar' : 'desactivar';
+    const confirmar = confirm(`¿Estás seguro de que deseas ${accionTexto} a "${persona.nombre}"?\n\nEsta acción cambiará el estado de su cuenta.`);
     
     if (confirmar) {
         try {
-            await eliminarUsuario(persona.usuarioID);
-            mostrarNotificacion('Personal eliminado exitosamente', 'success');
+            if (activo) {
+                const datosUsuario = {
+                    nombreUsuario: persona.nombreUsuario,
+                    nombre: persona.nombre,
+                    telefono: persona.telefono || "",
+                    rolID: persona.rolID,
+                    activo: true
+                };
+                await actualizarUsuario(persona.usuarioID, datosUsuario);
+                mostrarNotificacion('Personal activado exitosamente', 'success');
+            } else {
+                await eliminarUsuario(persona.usuarioID);
+                mostrarNotificacion('Personal desactivado exitosamente', 'success');
+            }
             await cargarPersonal();
         } catch (error) {
-            console.error('Error al eliminar personal:', error);
+            console.error(`Error al ${accionTexto} personal:`, error);
             mostrarNotificacion(error.message, 'error');
         }
     }

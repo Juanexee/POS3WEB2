@@ -74,15 +74,22 @@ export default class VentaService extends HttpService {
         }
         
         // Destructuración de objetos para transformar datos
-        const pedidosAgrupados = response.map(({ nombrePlatillo, cantidadTotal, fechaPrimerPedido, idsRelacionados }) => ({
+        const pedidosAgrupados = response.map(({ nombrePlatillo, cantidadTotal, fechaPrimerPedido, idsRelacionados, numerosMesas, estado }) => ({
             nombrePlatillo,
             cantidadTotal,
             fechaPrimerPedido: new Date(fechaPrimerPedido),
             idsRelacionados,
+            numerosMesas,
+            estado,
             tiempoEspera: this.#calcularTiempoEspera(fechaPrimerPedido)
         }));
         
         return { success: true, data: pedidosAgrupados };
+    }
+
+    async cobrar(ventaID) {
+        const response = await this.put(`${this.endpointBase}/${ventaID}/cobrar`);
+        return response;
     }
 
     // Método privado para calcular tiempo de espera

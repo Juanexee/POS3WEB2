@@ -7,6 +7,7 @@
     <title>Dashboard Restaurante - Platillos</title>
     
     <!-- ⚠️ CORREGIDO: La ruta del CSS -->
+    <link rel="stylesheet" href="../../shared/styles/shared.css">
     <link rel="stylesheet" href="../../shared/styles/style.css">
     <link rel="stylesheet" href="../../shared/styles/platillo.css">
 </head>
@@ -14,7 +15,7 @@
     <aside>
         <div class="perfil">
             <img src="../../shared/images/USER1.png" alt="Usuario">
-            <p>user1</p>
+            <p id="nombre-usuario-actual">user1</p>
         </div>
         <nav>
             <ul>
@@ -22,8 +23,8 @@
                 <li><a href="../../pages/categorias/Categoria.html">📁 Categorías</a></li>
                 <li><a href="../../pages/platillos/Platillo.html" class="active">🍔 Platillos</a></li>
                 <li><a href="../../pages/mesas/Mesas.html">🪑 Mesas</a></li>
-                <li><a href="../../pages/personal/Personal.html">👥 Personal</a></li>
-                <li><a href="../../pages/cocina/Cocina.html">🍳 Cocina</a></li>
+                <li><a href="../../pages/personal/personal.html">👥 Personal</a></li>
+                <li><a href="../../pages/cocina/cocina.html">🍳 Cocina</a></li>
                 <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
                 <li><a href="../../pages/Rol/Roles.html">🔐 Roles</a></li>
                 <li><a href="../../pages/admin/generar-qr.html">📱 Generar QR</a></li>
@@ -37,6 +38,10 @@
                 <h1>Lista de Platillos</h1>
                 <div class="herramientas">
                     <button id="btn-agregar-platillo" class="btn-primary" title="Agregar Platillo">+</button>
+                    <label class="lbl-mostrar-inactivos" style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; color: #555; user-select: none; margin-left: 10px; margin-right: 10px;">
+                        <input type="checkbox" id="chk-mostrar-inactivos" style="cursor: pointer;">
+                        Mostrar agotados
+                    </label>
                     <div class="input-busqueda">
                         🔍 <input type="text" id="input-buscar-platillo" placeholder="Buscar platillo...">
                     </div>
@@ -93,6 +98,16 @@
                                 <select id="categoria-platillo" name="categoriaID" required>
                                     <option value="">-- Seleccione --</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <div class="fila-formulario">
+                            <div class="campo">
+                                <label for="imagen-platillo">Imagen del Platillo</label>
+                                <input type="file" id="imagen-platillo" accept="image/*">
+                            </div>
+                            <div class="campo" style="display: flex; align-items: center; justify-content: center; min-height: 90px;">
+                                <img id="vista-previa-platillo" src="" alt="Vista previa" style="max-height: 80px; max-width: 120px; border-radius: 4px; display: none; margin-top: 10px; border: 1px solid #ddd;">
                             </div>
                         </div>
 

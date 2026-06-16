@@ -12,20 +12,20 @@
     
     <aside>
         <div class="perfil">
-            <img src="IMG/USER1.png" alt="Usuario">
-            <p>user1</p>
+            <img src="../../shared/images/USER1.png" alt="Usuario">
+            <p id="nombre-usuario-actual">user1</p>
         </div>
         <nav>
-          <ul>
-                <li><a href="../../pages/admin/inicio.html">🏠Inicio</a></li>
-                <li><a href="../../pages/categorias/Categoria.html" >📁 Categorías</a></li>
-                <li><a href="../../pages/platillos/Platillo.html" >🍔 Platillos</a></li>
+            <ul>
+                <li><a href="../../pages/admin/inicio.html">🏠 Inicio</a></li>
+                <li><a href="../../pages/categorias/Categoria.html">📁 Categorías</a></li>
+                <li><a href="../../pages/platillos/Platillo.html">🍔 Platillos</a></li>
                 <li><a href="../../pages/mesas/Mesas.html">🪑 Mesas</a></li>
-                <li><a href="../../pages/personal/Personal.html">👥 Personal</a></li>
-                <li><a href="../../pages/cocina/Cocina.html" class="active">🍳 Cocina</a></li>
-                 <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
-                 <li><a href="../../pages/Rol/Roles.html">🔐 Roles</a></li>
-                 <li><a href="../../pages/admin/generar-qr.html">📱 Generar QR</a></li>
+                <li><a href="../../pages/personal/personal.html">👥 Personal</a></li>
+                <li><a href="../../pages/cocina/cocina.html" class="active">🍳 Cocina</a></li>
+                <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
+                <li><a href="../../pages/Rol/Roles.html">🔐 Roles</a></li>
+                <li><a href="../../pages/admin/generar-qr.html">📱 Generar QR</a></li>
             </ul>
         </nav>
     </aside>
@@ -37,7 +37,7 @@
         <div class="reloj-servidor">21:45</div>
     </header>
 
-    <div class="contenedor-kds">
+    <div class="contenedor-kds" id="contenedor-kds">
   <div class="tarjeta-cocina alerta-roja">
     <div class="kds-badge">x5</div>
     <div class="kds-cuerpo">
@@ -85,6 +85,8 @@
     </div>
 </section>
 </main>
-    
+    <!-- Cargar SignalR y controlador de Cocina -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <script type="module" src="./cocina.js"></script>
 </body>
 </html>

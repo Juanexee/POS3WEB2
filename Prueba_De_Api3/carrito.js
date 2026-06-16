@@ -1,7 +1,7 @@
 // pages/carrito/carrito.js
 
-import VentaService from '../../shared/services/VentaService.js';
-import SesionService from '../../shared/services/SesionService.js';
+import VentaService from '../shared/services/ventaService.js';
+import SesionService from '../shared/services/SesionService.js';
 
 const ventaService = new VentaService();
 const sesionService = new SesionService();
@@ -119,6 +119,10 @@ async function procesarPedido() {
     let sesionID = localStorage.getItem('sesionActiva');
     let mesaID = localStorage.getItem('mesaActual');
 
+    // Evitar valores corruptos de localStorage ("undefined" o "null" como strings)
+    if (sesionID === 'undefined' || sesionID === 'null') sesionID = null;
+    if (mesaID === 'undefined' || mesaID === 'null') mesaID = null;
+
     if (!sesionID || !mesaID) {
         const mesaIngresada = prompt('Por favor, ingresa el número de tu mesa:');
         if (!mesaIngresada) {
@@ -127,13 +131,29 @@ async function procesarPedido() {
         }
         
         try {
-            const resultado = await sesionService.iniciarSesion(parseInt(mesaIngresada));
+            // Importación dinámica de MesaService para buscar la mesa
+            const MesaService = (await import('../shared/services/mesaService.js')).default;
+            const mesaService = new MesaService();
+            const mesas = await mesaService.obtenerTodas();
+            
+            // Buscar la mesa que coincide con el número físico ingresado
+            const mesaEncontrada = mesas.find(m => (m.numeroMesa || m.numero_mesa) === parseInt(mesaIngresada));
+            
+            if (!mesaEncontrada) {
+                alert(`La mesa número ${mesaIngresada} no está registrada en el sistema.`);
+                return;
+            }
+            
+            const dbMesaID = mesaEncontrada.mesaID || mesaEncontrada.id;
+            
+            const resultado = await sesionService.iniciarSesion(dbMesaID);
             if (!resultado.success) {
                 alert('Error al iniciar sesión: ' + resultado.message);
                 return;
             }
             sesionID = resultado.data.sesionID;
             mesaID = resultado.data.mesaID;
+            localStorage.setItem('numeroMesaVisual', mesaIngresada);
         } catch (error) {
             alert('Error al conectar con el servidor: ' + error.message);
             return;
@@ -172,7 +192,17 @@ async function procesarPedido() {
             localStorage.removeItem('carrito');
             window.location.href = 'menu.html';
         } else {
-            alert(`❌ Error al enviar pedido: ${result.message || 'Error desconocido'}`);
+            let errorMsg = result.message || 'Error desconocido';
+            if (result.originalError && result.originalError.data && result.originalError.data.errors) {
+                const detailedErrors = [];
+                for (const key in result.originalError.data.errors) {
+                    detailedErrors.push(result.originalError.data.errors[key].join(', '));
+                }
+                if (detailedErrors.length > 0) {
+                    errorMsg += '\n\nDetalles:\n- ' + detailedErrors.join('\n- ');
+                }
+            }
+            alert(`❌ Error al enviar pedido: ${errorMsg}`);
         }
     } catch (error) {
         console.error('Error al procesar pedido:', error);

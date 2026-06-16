@@ -1,6 +1,6 @@
 // pages/detalle/detalle.js
 
-import PlatilloService from '../../shared/services/platilloService.js';
+import PlatilloService from '../shared/services/platilloService.js';
 
 const platilloService = new PlatilloService();
 
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     document.getElementById('platillo-nombre').innerText = platillo.nombre;
     document.getElementById('platillo-precio').innerText = platillo.precioFormateado;
-    document.getElementById('platillo-imagen').src = platillo.imagenBase64 || '../../shared/images/placeholder.png';
+    document.getElementById('platillo-imagen').src = platillo.imagenBase64 || '../shared/images/placeholder.png';
     document.getElementById('platillo-descripcion').innerText = platillo.descripcion || 'Sin descripción';
     
     const btnPersonalizar = document.getElementById('btn-personalizar-link');

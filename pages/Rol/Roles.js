@@ -10,6 +10,7 @@ let listaCompletaRoles = [];
 let currentPage = 1;
 let itemsPerPage = 8;
 let filtroTexto = '';
+let chkMostrarInactivos;
 
 let tablaBody;
 let modalRol;
@@ -35,6 +36,14 @@ async function inicializarModuloRoles() {
     btnPrev = document.getElementById('btn-prev');
     btnNext = document.getElementById('btn-next');
     infoPagina = document.getElementById('info-pagina');
+    chkMostrarInactivos = document.getElementById('chk-mostrar-inactivos');
+
+    if (chkMostrarInactivos) {
+        chkMostrarInactivos.addEventListener('change', () => {
+            currentPage = 1;
+            renderizarTabla();
+        });
+    }
 
     if (btnAbrirAgregar) {
         btnAbrirAgregar.addEventListener('click', () => abrirModalAgregar());
@@ -94,6 +103,11 @@ function renderizarTabla() {
     if (!tablaBody) return;
     
     let datosFiltrados = [...listaCompletaRoles];
+    const mostrarInactivos = chkMostrarInactivos ? chkMostrarInactivos.checked : false;
+    if (!mostrarInactivos) {
+        datosFiltrados = datosFiltrados.filter(rol => rol.activo === true);
+    }
+    
     if (filtroTexto) {
         datosFiltrados = datosFiltrados.filter(rol => 
             (rol.nombreRol && rol.nombreRol.toLowerCase().includes(filtroTexto)) ||
@@ -133,7 +147,10 @@ function renderizarTabla() {
             <td><span class="estado-badge ${estadoClass}">${estadoTexto}</span></td>
             <td>
                 <button class="btn-editar" data-id="${rol.rolID}">✏️ Editar</button>
-                ${rol.activo ? `<button class="btn-desactivar" data-id="${rol.rolID}">🔒 Desactivar</button>` : ''}
+                ${rol.activo 
+                    ? `<button class="btn-desactivar" data-id="${rol.rolID}">🔒 Desactivar</button>` 
+                    : `<button class="btn-activar" data-id="${rol.rolID}">✅ Activar</button>`
+                }
             </td>
         `;
         
@@ -152,13 +169,25 @@ function renderizarTabla() {
         btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.id);
             const rol = listaCompletaRoles.find(r => r.rolID === id);
-            if (rol) confirmarDesactivar(rol);
+            if (rol) confirmarCambiarEstado(rol, false);
+        });
+    });
+
+    document.querySelectorAll('.btn-activar').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = parseInt(btn.dataset.id);
+            const rol = listaCompletaRoles.find(r => r.rolID === id);
+            if (rol) confirmarCambiarEstado(rol, true);
         });
     });
 }
 
 function totalPages() {
     let datosFiltrados = [...listaCompletaRoles];
+    const mostrarInactivos = chkMostrarInactivos ? chkMostrarInactivos.checked : false;
+    if (!mostrarInactivos) {
+        datosFiltrados = datosFiltrados.filter(rol => rol.activo === true);
+    }
     if (filtroTexto) {
         datosFiltrados = datosFiltrados.filter(rol => 
             (rol.nombreRol && rol.nombreRol.toLowerCase().includes(filtroTexto)) ||
@@ -232,11 +261,22 @@ async function guardarRol() {
     }
 }
 
-async function confirmarDesactivar(rol) {
-    if (confirm(`¿Desactivar el rol "${rol.nombreRol}"?`)) {
+async function confirmarCambiarEstado(rol, activo) {
+    const accionTexto = activo ? 'activar' : 'desactivar';
+    if (confirm(`¿Estás seguro de que deseas ${accionTexto} el rol "${rol.nombreRol}"?`)) {
         try {
-            await desactivarRol(rol.rolID);
-            alert('Rol desactivado exitosamente');
+            if (activo) {
+                await actualizarRol({
+                    rolID: rol.rolID,
+                    nombreRol: rol.nombreRol,
+                    descripcionRol: rol.descripcionRol || '',
+                    activo: true
+                });
+                alert('Rol activado exitosamente');
+            } else {
+                await desactivarRol(rol.rolID);
+                alert('Rol desactivado exitosamente');
+            }
             await cargarRoles();
         } catch (error) {
             alert(`Error: ${error.message}`);

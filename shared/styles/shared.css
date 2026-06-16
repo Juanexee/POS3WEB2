@@ -17,9 +17,18 @@ body {
 @media (min-width: 768px) {
     body {
         grid-template-columns: 250px 1fr;
+        height: 100vh !important;
+        overflow: hidden !important;
     }
     aside {
-        min-height: 100vh;
+        height: 100vh !important;
+        position: sticky !important;
+        top: 0 !important;
+        overflow-y: auto !important;
+    }
+    main {
+        height: 100vh !important;
+        overflow-y: auto !important;
     }
 }
 
@@ -120,12 +129,195 @@ th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
 tbody tr:nth-child(even) { background-color: #f9fafb; }
 tbody tr:hover { background-color: #f3f4f6; }
 
-/* Botones de Acción */
-.btn-primary { background-color: #0e0e0e; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 24px; cursor: pointer; }
-.btn-guardar { background-color: #0e0e0e; color: white; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; justify-content: center; margin-top: 40px; margin-bottom: 10px;}
-.btn-salir { background-color: #e0e0e0; color: #333; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; justify-content: center; margin-top: 40px; margin-bottom: 10px; }
-.btn-edit { background-color: #0e0e0e; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
-.btn-delete { background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+/* ============================================================
+   SISTEMA DE DISEÑO DE BOTONES (VARIABLES)
+   ============================================================ */
+:root {
+    --primary-color: #ff6b00;       /* Naranja Mimi */
+    --primary-hover: #e65a00;
+    --dark-color: #1a1a1a;          /* Negro Mate */
+    --dark-hover: #333333;
+    --danger-color: #e63946;        /* Rojo Coral */
+    --danger-hover: #cb2d3e;
+    --secondary-color: #f3f4f6;     /* Gris Claro */
+    --secondary-text: #4b5563;
+    --secondary-hover: #e5e7eb;
+    --warning-color: #ffc107;       /* Amarillo/Oro */
+    --warning-hover: #e0a800;
+    --warning-text: #000000;
+    --border-radius-sm: 6px;
+    --border-radius-md: 10px;
+    --transition-speed: 0.2s;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones de Acción / Principales (Guardar, Confirmar, Agregar, Login) */
+.btn-guardar, .btn-primary, .btn-get-started, .btn-agregar-top {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 28px !important;
+    border-radius: var(--border-radius-md) !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    cursor: pointer !important;
+    transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: var(--shadow-sm) !important;
+    outline: none !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-top: 30px !important;
+    margin-bottom: 10px !important;
+}
+
+.btn-guardar:hover, .btn-primary:hover, .btn-get-started:hover, .btn-agregar-top:hover {
+    background-color: var(--primary-hover) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.btn-guardar:active, .btn-primary:active, .btn-get-started:active, .btn-agregar-top:active {
+    transform: translateY(0) !important;
+}
+
+/* Botón Circular de "+" en la cabecera del mapa o listas */
+.btn-agregar-top, .btn-primary {
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    font-size: 24px !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+}
+
+/* Botón Secundario (Cancelar, Salir, Volver) */
+.btn-salir, .btn-secondary {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background-color: var(--secondary-color) !important;
+    color: var(--secondary-text) !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 12px 24px !important;
+    border-radius: var(--border-radius-md) !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    cursor: pointer !important;
+    transition: all var(--transition-speed) ease !important;
+    outline: none !important;
+    margin-top: 30px !important;
+    margin-bottom: 10px !important;
+}
+
+.btn-salir:hover, .btn-secondary:hover {
+    background-color: var(--secondary-hover) !important;
+    color: #111827 !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Botones en Modales (Quitar márgenes heredados innecesarios) */
+.botones-acciones button {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Botones de Tabla: Editar (✏️) */
+.btn-edit, .btn-editar, .btn-editar-rapido {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--dark-color) !important;
+    color: white !important;
+    border: none !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important; /* Pill shape */
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all var(--transition-speed) ease !important;
+    gap: 5px !important;
+    margin: 2px 4px !important;
+    white-space: nowrap !important;
+}
+
+.btn-edit:hover, .btn-editar:hover, .btn-editar-rapido:hover {
+    background-color: var(--dark-hover) !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+/* Botones de Tabla: Eliminar/Desactivar (🔒 / 🗑️) */
+.btn-delete, .btn-eliminar, .btn-eliminar-rapido, .btn-desactivar {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--danger-color) !important;
+    color: white !important;
+    border: none !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important; /* Pill shape */
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all var(--transition-speed) ease !important;
+    gap: 5px !important;
+    margin: 2px 4px !important;
+    white-space: nowrap !important;
+}
+
+.btn-delete:hover, .btn-eliminar:hover, .btn-eliminar-rapido:hover, .btn-desactivar:hover {
+    background-color: var(--danger-hover) !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+/* Botones de Tabla: Activar (✅) */
+.btn-activar, .btn-activate {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #28a745 !important;
+    color: white !important;
+    border: none !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important; /* Pill shape */
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all var(--transition-speed) ease !important;
+    gap: 5px !important;
+    margin: 2px 4px !important;
+    white-space: nowrap !important;
+}
+
+.btn-activar:hover, .btn-activate:hover {
+    background-color: #218838 !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+/* Evitar que los botones de acción se dividan en varias líneas */
+table td:last-child {
+    white-space: nowrap !important;
+}
+
+/* Botón Especial: Cobrar cuenta / Pagar (💰) */
+#btn-cobrar-mesa, .btn-pay {
+    background-color: var(--warning-color) !important;
+    color: var(--warning-text) !important;
+    border: none !important;
+    transition: all var(--transition-speed) ease !important;
+}
+
+#btn-cobrar-mesa:hover, .btn-pay:hover {
+    background-color: var(--warning-hover) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
 
 /* Paginación */
 .paginacion {
@@ -138,17 +330,29 @@ tbody tr:hover { background-color: #f3f4f6; }
 }
 
 .paginacion button {
-    background-color: #0e0e0e;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--dark-color) !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    border-radius: var(--border-radius-sm) !important;
+    cursor: pointer !important;
+    transition: all var(--transition-speed) ease !important;
+    margin: 0 !important;
+}
+
+.paginacion button:hover:not(:disabled) {
+    background-color: var(--dark-hover) !important;
+    transform: translateY(-1px) !important;
 }
 
 .paginacion button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+    background-color: #d1d5db !important;
+    color: #9ca3af !important;
+    cursor: not-allowed !important;
+    transform: none !important;
 }
 
 #info-pagina {
@@ -249,4 +453,48 @@ tbody tr:hover { background-color: #f3f4f6; }
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     background-color: #ffb142; color: white; width: 100px; height: 100px;
     border-radius: 15px; cursor: pointer;
+}
+
+/* Botones de Tabla Factura: Ver, Imprimir, Cobrar */
+.btn-view, .btn-print, .btn-pay {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important; /* Pill shape */
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    gap: 5px !important;
+    margin: 2px 4px !important;
+    white-space: nowrap !important;
+}
+
+.btn-view {
+    background-color: #4b5563 !important; /* Gris */
+    color: white !important;
+}
+.btn-view:hover {
+    background-color: #374151 !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+.btn-print {
+    background-color: #0e0e0e !important; /* Negro */
+    color: white !important;
+}
+.btn-print:hover {
+    background-color: #333333 !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+.btn-pay {
+    background-color: #ffc107 !important; /* Amarillo/Oro */
+    color: #000000 !important;
+}
+.btn-pay:hover {
+    background-color: #e0a800 !important;
+    transform: translateY(-1px) scale(1.02) !important;
 }

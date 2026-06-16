@@ -71,39 +71,7 @@ tbody tr:hover {
     border: 1px solid #f5c6cb;
 }
 
-/* Botones de acción */
-.btn-editar {
-    background-color: #0e0e0e;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-right: 8px;
-    font-size: 14px;
-    transition: all 0.2s ease;
-}
-
-.btn-editar:hover {
-    background-color: #333;
-    transform: scale(1.02);
-}
-
-.btn-eliminar {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-}
-
-.btn-eliminar:hover {
-    background-color: #c82333;
-    transform: scale(1.02);
-}
+/* Botones de acción estilizados por shared.css */
 
 /* Botón Agregar (+) */
 .btn-agregar-top {

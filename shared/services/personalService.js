@@ -24,7 +24,7 @@ export default class PersonalService extends HttpService {
     }
 
     async actualizar(id, datosUsuario) {
-        const response = await this.put(`${this.endpointBase}/${id}/Actualizar%20usuario`, datosUsuario);
+        const response = await this.put(`${this.endpointBase}/${id}/actualizar`, datosUsuario);
         if (response.success === false) {
             throw new Error(response.message || 'Error al actualizar usuario');
         }

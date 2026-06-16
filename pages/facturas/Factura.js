@@ -1,6 +1,6 @@
 // pages/facturas/Factura.js
 
-import VentaService from '../../shared/services/VentaService.js';
+import VentaService from '../../shared/services/ventaService.js';
 import { Venta } from '../../shared/models/Venta.js';
 import { DetalleVenta } from '../../shared/models/DetalleVenta.js';
 
@@ -127,6 +127,13 @@ async function inicializarModuloFacturas() {
     
     // Cargar datos
     await cargarFacturas();
+
+    // Procesar cobro automático si viene redireccionado del módulo de mesas
+    const urlParams = new URLSearchParams(window.location.search);
+    const cobrarVentaId = urlParams.get('cobrarVentaId');
+    if (cobrarVentaId) {
+        abrirModalCobro(parseInt(cobrarVentaId));
+    }
 }
 
 async function cargarFacturas() {
@@ -231,15 +238,15 @@ function renderizarTabla(facturas) {
             <td>
                 <div class="table-actions">
                     <button class="btn-view" data-id="${factura.ventaID}" title="Ver Detalle">
-                        👁️
+                        👁️ Ver
                     </button>
                     ${factura.estado !== 'Pagada' ? 
                         `<button class="btn-pay" data-id="${factura.ventaID}" title="Cobrar">
-                            💰
+                            💰 Cobrar
                         </button>` : ''
                     }
                     <button class="btn-print" data-id="${factura.ventaID}" title="Imprimir">
-                        🖨️
+                        🖨️ Imprimir
                     </button>
                 </div>
             </td>
@@ -408,8 +415,11 @@ async function procesarCobro() {
     if (!confirmar) return;
     
     try {
-        // Aquí llamarías al endpoint de cobro
-        // Por ahora simulamos éxito
+        const response = await ventaService.cobrar(facturaSeleccionada.ventaID);
+        if (response.success === false) {
+            throw new Error(response.message || 'Error al procesar el cobro en el servidor');
+        }
+        
         mostrarNotificacion('✅ Cobro registrado exitosamente', 'success');
         
         modalDetalle.style.display = 'none';

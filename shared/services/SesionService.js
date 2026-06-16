@@ -17,19 +17,21 @@ export default class SesionService extends HttpService {
             return { success: false, message: response.message };
         }
         
-        // Guardar en localStorage usando destructuring
-        const { sesionID, mesaID: mesaIdRetornada, estado } = response;
+        // Carga robusta de las propiedades del backend (soportando camelCase y PascalCase)
+        const sesionID = response.sesionID ?? response.sesionId;
+        const mesaIdRetornada = response.mesaID ?? response.mesaId ?? mesaID;
+        const estado = response.estado ?? response.Estado ?? 'Activo';
         
         if (sesionID) {
             localStorage.setItem('sesionActiva', sesionID);
-            localStorage.setItem('mesaActual', mesaIdRetornada || mesaID);
+            localStorage.setItem('mesaActual', mesaIdRetornada);
         }
         
-        return { success: true, data: { sesionID, mesaID: mesaIdRetornada || mesaID, estado } };
+        return { success: true, data: { sesionID, mesaID: mesaIdRetornada, estado } };
     }
 
     // Aceptar lote de pedidos (cocina)
-    async aceptarLote(idsPedidos, nuevoEstado = 'EnPreparacion') {
+    async aceptarLote(idsPedidos, nuevoEstado = 'Preparando') {
         const response = await this.post(`${this.endpointBase}/aceptar-lote`, {
             idsPedidos,
             nuevoEstado

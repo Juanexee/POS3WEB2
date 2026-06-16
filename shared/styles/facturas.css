@@ -163,8 +163,7 @@ header h1 {
     transition: all 0.2s ease;
 }
 
-.btn-view { background-color: #4b5563; color: white; }
-.btn-print { background-color: #0e0e0e; color: white; }
+/* Botones de acción estilizados por shared.css */
 
 .btn-action:hover {
     transform: translateY(-2px);
