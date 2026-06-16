@@ -22,12 +22,19 @@ let inputBuscar;
 let btnRefrescar;
 let btnPrev, btnNext, infoPagina;
 
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
+// Inicialización robusta
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Factura.js: DOMContentLoaded fired.');
+        inicializarModuloFacturas();
+    });
+} else {
+    console.log('Factura.js: DOM already ready.');
     inicializarModuloFacturas();
-});
+}
 
 async function inicializarModuloFacturas() {
+    console.log('Factura.js: inicializarModuloFacturas() started.');
     // Obtener referencias
     tablaBody = document.getElementById('invoice-table-body');
     cardsContainer = document.getElementById('invoice-cards-container');
@@ -137,6 +144,7 @@ async function inicializarModuloFacturas() {
 }
 
 async function cargarFacturas() {
+    console.log('Factura.js: cargarFacturas() invoked.');
     try {
         if (tablaBody) {
             tablaBody.innerHTML = '<tr><td colspan="7" class="text-center">Cargando facturas...</td></tr>';
@@ -145,7 +153,9 @@ async function cargarFacturas() {
             cardsContainer.innerHTML = '<div class="loading-cards">Cargando facturas...</div>';
         }
         
+        console.log('Factura.js: Fetching all invoices from ventaService...');
         const { success, data: facturas } = await ventaService.obtenerTodas();
+        console.log('Factura.js: Fetch finished.', { success, count: facturas ? facturas.length : 0 });
         
         if (!success || !facturas) {
             throw new Error('No se pudieron cargar las facturas');
@@ -155,7 +165,7 @@ async function cargarFacturas() {
         renderizarFacturas();
         
     } catch (error) {
-        console.error('Error cargando facturas:', error);
+        console.error('Factura.js: Error in cargarFacturas():', error);
         if (tablaBody) {
             tablaBody.innerHTML = `<tr><td colspan="7" class="text-center" style="color:#dc3545;">⚠️ ${error.message}</td></tr>`;
         }
