@@ -1,5 +1,5 @@
 // shared/models/Categoria.js
-export const BASE_URL = "https://localhost:7081";
+export const BASE_URL = "https://backend.rancholamimi.com:7081";
 
 export class Categoria {
     #categoriaID;
