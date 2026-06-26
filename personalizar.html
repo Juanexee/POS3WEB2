@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="menu.css">
+    <title>Personalizar Platillo - Rancho la Mimi</title>
+</head>
+<body class="detail-page">
+    <header class="header-back">
+        <a href="javascript:history.back()" class="back-btn">⬅ Volver</a>
+    </header>
+    <main class="container centered">
+    <h1 class="category-title">Personaliza tu orden</h1>
+
+        <!-- Resumen del Producto Seleccionado -->
+    <div class="small-product-info-customizer">
+            <img id="platillo-imagen" src="" alt="Platillo">
+            <div class="info-text">
+                <h2 id="platillo-nombre">Cargando...</h2>
+                <p id="platillo-precio">C$ --</p>
+            </div>
+        </div>
+        
+        <!-- Contenedor dinámico de opciones -->
+        <div id="opciones-contenedor" class="opciones-contenedor">
+            <!-- Las opciones de personalización se inyectarán aquí con JavaScript -->
+        </div>
+        <!-- Botón de Acción -->
+        <div class="detail-actions-customizer"></div>
+            <button id="btn-confirmar-personalizacion" class="btn-yellow">Confirmar y Agregar</button>
+        </div>
+    </main>
+    <script type="module" src="personalizar.js"></script>
+</body>
+</html>

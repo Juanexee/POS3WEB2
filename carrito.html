@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Carrito - Rancho la Mimi</title>
+    <link rel="stylesheet" href="menu.css">
+</head>
+<body class="cart-page">
+
+    </header>
+    <header class="cart-header-custom">
+        <a href="index.html" class="cart-back-btn">⬅ Volver al Menú</a>
+        <h1>Mi lista de carrito</h1>
+    </header>
+        <!-- Lista de Items en el Carrito (Dinámica) -->
+        <div id="cart-list" class="cart-list">
+            <!-- Los platillos agregados se cargarán aquí con JS -->
+        </div>
+
+        <!-- Resumen del Carrito -->
+        <div id="cart-summary-block" class="cart-summary-block">
+            <div class="summary-row-item">
+                <span>SUBTOTAL</span> <span id="cart-subtotal" class="bold-text">C$ --</span>
+            </div>
+
+            <div class="summary-total-item">
+                <span>TOTAL</span> <span id="cart-total" class="total-val">C$ --</span>
+            </div>
+
+            
+            <button id="btn-ordenar" class="btn-order">ORDENA AHORA</button>
+        </div>
+    </main>
+    <nav class="bottom-nav">
+        <a href="index.html">🏠</a>
+        <a href="carrito.html" class="active">🛒</a>
+    </nav>
+    <script type="module" src="carrito.js"></script>
+</body>
+</html>
