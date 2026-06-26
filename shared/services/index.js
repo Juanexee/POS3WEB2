@@ -19,7 +19,8 @@ export {
     guardarSesion, 
     cerrarSesion, 
     estaAutenticado, 
-    obtenerUsuarioActual 
+    obtenerUsuarioActual,
+    obtenerUsuarioIdActual
 } from './authService.js';
 
 // Configuración

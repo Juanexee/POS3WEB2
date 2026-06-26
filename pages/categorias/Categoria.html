@@ -25,6 +25,7 @@
                 <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
                 <li><a href="../../pages/Rol/Roles.html">🔐 Roles</a></li>
                 <li><a href="../../pages/admin/generar-qr.html">📱 Generar QR</a></li>
+                <li><a href="#" id="btn-cerrar-sesion" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; color: #ff6b00;">🚪 Cerrar Sesión</a></li>
             </ul>
         </nav>
     </aside>
@@ -37,6 +38,11 @@
 
         <div class="herramientas">
             <button id="btn-agregar-platillo" class="btn-primary" title="Agregar Categoría">+</button>
+
+            <label class="lbl-mostrar-inactivos" style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; color: #555; user-select: none; margin-left: 10px; margin-right: 10px;">
+                <input type="checkbox" id="chk-mostrar-inactivos" style="cursor: pointer;">
+                Mostrar desactivadas
+            </label>
 
             <div class="input-busqueda">
                 <span>🔍</span>
@@ -70,7 +76,7 @@
                 <h3>Gestión de Categoría</h3>
             </header>
 
-            <main class="modal-body">
+            <div class="modal-body">
                 <form id="form-categoria">
                     <div class="fila-formulario">
                         <div class="campo">
@@ -86,16 +92,17 @@
                         </div>
                     </div>
                 </form>
-            </main>
+            </div>
 
-            <footer class="botones-acciones">
+            <div class="botones-acciones">
                 <button type="submit" form="form-categoria" class="btn-guardar">Guardar</button>
                 <button type="button" class="btn-salir">Salir</button>
-            </footer>
+            </div>
 
         </div>
     </div>
 
+    <script type="module" src="../../shared/utils/menu.js"></script>
     <script type="module" src="./categoriaController.js"></script>
 
 </body>

@@ -81,6 +81,6 @@ export async function cambiarMesaService(sesionId, nuevaMesaId) {
 
 export async function entregarPedidosService(idsPedidos) {
     const service = new MesaService();
-    const response = await service.post('/api/Sesion/entregar-pedidos', { idsPedidos });
+    const response = await service.post('/api/Sesion/entregar-pedidos', { idsPedidos, nuevoEstado: 'Entregado' });
     return response;
 }

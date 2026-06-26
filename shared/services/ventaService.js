@@ -26,7 +26,8 @@ export default class VentaService extends HttpService {
             total: ventaData.total,
             estado: ventaData.estado,
             usuarioID: ventaData.usuarioID,
-            nombreCajero: ventaData.nombreCajero
+            nombreCajero: ventaData.nombreCajero,
+            mesaID: ventaData.mesaID
         }));
         
         return { success: true, data: ventas };
@@ -74,13 +75,14 @@ export default class VentaService extends HttpService {
         }
         
         // Destructuración de objetos para transformar datos
-        const pedidosAgrupados = response.map(({ nombrePlatillo, cantidadTotal, fechaPrimerPedido, idsRelacionados, numerosMesas, estado }) => ({
+        const pedidosAgrupados = response.map(({ nombrePlatillo, cantidadTotal, fechaPrimerPedido, idsRelacionados, numerosMesas, estado, comentarios }) => ({
             nombrePlatillo,
             cantidadTotal,
             fechaPrimerPedido: new Date(fechaPrimerPedido),
             idsRelacionados,
             numerosMesas,
             estado,
+            comentarios,
             tiempoEspera: this.#calcularTiempoEspera(fechaPrimerPedido)
         }));
         

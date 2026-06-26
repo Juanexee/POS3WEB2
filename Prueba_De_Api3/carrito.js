@@ -193,19 +193,44 @@ async function procesarPedido() {
             window.location.href = 'menu.html';
         } else {
             let errorMsg = result.message || 'Error desconocido';
-            if (result.originalError && result.originalError.data && result.originalError.data.errors) {
-                const detailedErrors = [];
-                for (const key in result.originalError.data.errors) {
-                    detailedErrors.push(result.originalError.data.errors[key].join(', '));
+            let detailMsg = '';
+            
+            if (result.originalError && result.originalError.data) {
+                if (result.originalError.data.detail) {
+                    detailMsg = result.originalError.data.detail;
+                    errorMsg += `\nDetalle: ${detailMsg}`;
                 }
-                if (detailedErrors.length > 0) {
-                    errorMsg += '\n\nDetalles:\n- ' + detailedErrors.join('\n- ');
+                if (result.originalError.data.errors) {
+                    const detailedErrors = [];
+                    for (const key in result.originalError.data.errors) {
+                        detailedErrors.push(result.originalError.data.errors[key].join(', '));
+                    }
+                    if (detailedErrors.length > 0) {
+                        errorMsg += '\n\nDetalles:\n- ' + detailedErrors.join('\n- ');
+                    }
                 }
             }
+
+            const textToSearch = (errorMsg + ' ' + detailMsg + ' ' + JSON.stringify(result)).toLowerCase();
+            if (textToSearch.includes('sesi') || textToSearch.includes('session')) {
+                localStorage.removeItem('sesionActiva');
+                localStorage.removeItem('mesaActual');
+                localStorage.removeItem('numeroMesaVisual');
+                errorMsg += '\n\n⚠️ Su sesión de mesa ha expirado o es inválida y ha sido restablecida. Por favor, intente ordenar de nuevo e ingrese su número de mesa o escanee el código QR.';
+            }
+
             alert(`❌ Error al enviar pedido: ${errorMsg}`);
         }
     } catch (error) {
         console.error('Error al procesar pedido:', error);
-        alert('Error de conexión. Por favor, intenta de nuevo.');
+        let errorMsg = 'Error de conexión. Por favor, intenta de nuevo.';
+        const textToSearch = (error.message || '').toLowerCase();
+        if (textToSearch.includes('sesi') || textToSearch.includes('session')) {
+            localStorage.removeItem('sesionActiva');
+            localStorage.removeItem('mesaActual');
+            localStorage.removeItem('numeroMesaVisual');
+            errorMsg = 'Su sesión de mesa ha expirado o es inválida y ha sido restablecida. Por favor, intente ordenar de nuevo e ingrese su número de mesa o escanee el código QR.';
+        }
+        alert(errorMsg);
     }
 }

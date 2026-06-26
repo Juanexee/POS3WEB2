@@ -341,6 +341,29 @@ function renderizarCards(facturas) {
     });
 }
 
+function formatComment(commentStr) {
+    if (!commentStr) return '';
+    try {
+        const obj = JSON.parse(commentStr);
+        let parts = [];
+        if (obj.opciones && Array.isArray(obj.opciones)) {
+            obj.opciones.forEach(opt => {
+                if (opt.seleccion) {
+                    const sel = Array.isArray(opt.seleccion) ? opt.seleccion.join(', ') : opt.seleccion;
+                    parts.push(`${opt.grupo}: ${sel}`);
+                }
+            });
+        }
+        if (obj.nota) {
+            parts.push(`Nota: "${obj.nota}"`);
+        }
+        if (parts.length > 0) return parts.join(', ');
+    } catch (e) {
+        // Not a JSON string
+    }
+    return commentStr;
+}
+
 async function verDetalleFactura(ventaID) {
     try {
         const { success, data: venta } = await ventaService.obtenerPorId(ventaID);
@@ -366,14 +389,21 @@ async function verDetalleFactura(ventaID) {
             if (venta.detalles.length === 0) {
                 listaProductos.innerHTML = '<p class="text-center">No hay productos en esta factura</p>';
             } else {
-                listaProductos.innerHTML = venta.detalles.map(detalle => `
-                    <div class="producto-item">
-                        <span class="producto-nombre">${detalle.nombreProducto}</span>
-                        <span class="producto-cantidad">x${detalle.cantidad}</span>
-                        <span class="producto-precio">C$${detalle.precioUnitario.toFixed(2)}</span>
-                        <span class="producto-subtotal">C$${detalle.subtotal.toFixed(2)}</span>
-                    </div>
-                `).join('');
+                listaProductos.innerHTML = venta.detalles.map(detalle => {
+                    const commentText = detalle.personalizacionTexto ? detalle.personalizacionTexto.replace(/\n/g, ', ') : '';
+                    const notesHtml = commentText ? `<div class="producto-nota" style="font-size: 0.85rem; color: #ff6b00; margin-left: 10px; font-style: italic;">• ${commentText}</div>` : '';
+                    return `
+                        <div class="producto-item-wrapper" style="margin-bottom: 8px; border-bottom: 1px dashed #eee; padding-bottom: 6px;">
+                            <div class="producto-item" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="producto-nombre" style="font-weight: 500;">${detalle.nombreProducto}</span>
+                                <span class="producto-cantidad">x${detalle.cantidad}</span>
+                                <span class="producto-precio">C$${detalle.precioUnitario.toFixed(2)}</span>
+                                <span class="producto-subtotal" style="font-weight: 600;">C$${detalle.subtotal.toFixed(2)}</span>
+                            </div>
+                            ${notesHtml}
+                        </div>
+                    `;
+                }).join('');
             }
         }
         

@@ -1,6 +1,6 @@
 // pages/login/login.js
 
-// IMPORTACIÓN CORREGIDA - El nombre es 'guardarSesion' (con 's' minúscula)
+
 import { login, guardarSesion } from '../../shared/services/authService.js';
 
 document.getElementById('form-login').addEventListener('submit', handleLoginSubmit);

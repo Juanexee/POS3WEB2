@@ -53,6 +53,23 @@ export default class AuthService extends HttpService {
     obtenerUsuarioActual() {
         return localStorage.getItem('usuario_activo');
     }
+
+    obtenerUsuarioIdActual() {
+        const token = localStorage.getItem('token_mimi') || localStorage.getItem('authToken');
+        if (!token) return null;
+        try {
+            const parts = token.split('.');
+            if (parts.length !== 3) return null;
+            const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+            const id = payload.nameid || 
+                       payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || 
+                       payload.sub;
+            return id ? parseInt(id) : null;
+        } catch (e) {
+            console.error('Error al decodificar token JWT:', e);
+            return null;
+        }
+    }
 }
 
 // Exportaciones para compatibilidad con login.js
@@ -79,4 +96,9 @@ export function estaAutenticado() {
 export function obtenerUsuarioActual() {
     const authService = new AuthService();
     return authService.obtenerUsuarioActual();
+}
+
+export function obtenerUsuarioIdActual() {
+    const authService = new AuthService();
+    return authService.obtenerUsuarioIdActual();
 }

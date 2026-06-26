@@ -10,7 +10,7 @@ export default class CategoriaService extends HttpService {
     }
 
     async obtenerTodas() {
-        // Ahora la URL será: https://localhost:7081/api/Categoria/Leer
+ 
         const response = await this.get(`${this.endpointBase}/Leer`);
         
         if (response.success === false) {
@@ -21,7 +21,8 @@ export default class CategoriaService extends HttpService {
         if (Array.isArray(response)) {
             return response.map(cat => ({
                 categoriaID: cat.categoriaID || cat.CategoriaID,
-                nombre: cat.nombre || cat.Nombre
+                nombre: cat.nombre || cat.Nombre,
+                activo: cat.activo !== undefined ? cat.activo : (cat.Activo !== undefined ? cat.Activo : true)
             }));
         }
         
@@ -65,6 +66,16 @@ export default class CategoriaService extends HttpService {
         
         return true;
     }
+
+    async activar(id) {
+        const response = await this.put(`${this.endpointBase}/Activar/${id}`);
+        
+        if (response.success === false) {
+            throw new Error(response.message || 'No se pudo activar la categoría');
+        }
+        
+        return true;
+    }
 }
 
 // Exportaciones para compatibilidad
@@ -86,4 +97,9 @@ export async function actualizarCategoria(id, payload) {
 export async function eliminarCategoria(id) {
     const service = new CategoriaService();
     return await service.eliminar(id);
+}
+
+export async function activarCategoria(id) {
+    const service = new CategoriaService();
+    return await service.activar(id);
 }

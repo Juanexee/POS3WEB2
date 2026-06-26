@@ -46,11 +46,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function obtenerOpcionesPorPlatillo(platillo) {
+    const nombre = platillo.nombre.toLowerCase();
     const catID = platillo.categoriaID;
 
-    if (catID === 4) {
+    // 1. Detección por nombre de platillo específico
+    if (nombre.includes('nacatamal')) {
         return {
-            placeholderNota: 'Ej: Sin tomate, sin lechuga...',
+            placeholderNota: 'Ej: Sin cebolla, con más chile...',
+            grupos: [
+                {
+                    titulo: 'Preparación',
+                    tipo: 'radio',
+                    nombreInput: 'nacatamal-prep',
+                    opciones: [
+                        { texto: 'Normal', extraCost: 0, checked: true },
+                        { texto: 'Sin Chile', extraCost: 0 }
+                    ]
+                },
+                {
+                    titulo: 'Acompañamiento',
+                    tipo: 'checkbox',
+                    opciones: [
+                        { texto: 'Con Pan', extraCost: 5 },
+                        { texto: 'Con Café', extraCost: 15 }
+                    ]
+                }
+            ]
+        };
+    }
+
+    if (nombre.includes('hamburguesa')) {
+        return {
+            placeholderNota: 'Ej: Sin cebolla, sin mayonesa...',
             grupos: [
                 {
                     titulo: 'Escoge el tamaño',
@@ -75,78 +102,116 @@ function obtenerOpcionesPorPlatillo(platillo) {
         };
     }
 
-    if (catID === 3) {
+    if (nombre.includes('ribeye') || nombre.includes('carne')) {
         return {
-            placeholderNota: 'Ej: Sin cebolla, bien tostado...',
+            placeholderNota: 'Ej: Término de carne específico...',
             grupos: [
                 {
-                    titulo: 'Tamaño',
+                    titulo: 'Término de la carne',
                     tipo: 'radio',
-                    nombreInput: 'pizza-size',
+                    nombreInput: 'cooking-point',
                     opciones: [
-                        { texto: 'Pequeño', extraCost: 0, checked: true },
-                        { texto: 'Mediano', extraCost: 50 },
-                        { texto: 'Grande', extraCost: 90 }
+                        { texto: 'Bien Asada', extraCost: 0, checked: true },
+                        { texto: 'Término Medio', extraCost: 0 },
+                        { texto: 'Tres Cuartos', extraCost: 0 }
                     ]
                 },
                 {
-                    titulo: 'Extras',
-                    tipo: 'checkbox',
+                    titulo: 'Acompañamiento',
+                    tipo: 'radio',
+                    nombreInput: 'side-dish',
                     opciones: [
-                        { texto: 'Queso extra', extraCost: 25 },
-                        { texto: 'Tocino', extraCost: 25 },
-                        { texto: 'Salsa especial', extraCost: 15 }
+                        { texto: 'Gallopinto y Maduro', extraCost: 0, checked: true },
+                        { texto: 'Tajadas Con Queso', extraCost: 0 },
+                        { texto: 'Papas Fritas', extraCost: 0 }
                     ]
                 }
             ]
         };
     }
 
-    if (catID === 2) {
+    // 2. Detección por Categoría
+    if (catID === 3 || catID === 5) { // Bebidas (3) o Vinos (5)
         return {
-            placeholderNota: 'Ej: Sin azúcar, con hielo...',
+            placeholderNota: 'Ej: Con limón, con sal, al tiempo...',
             grupos: [
                 {
-                    titulo: 'Preparación',
+                    titulo: 'Temperatura',
                     tipo: 'radio',
-                    nombreInput: 'drink-prep',
+                    nombreInput: 'drink-temp',
+                    opciones: [
+                        { texto: 'Fría', extraCost: 0, checked: true },
+                        { texto: 'Al Tiempo', extraCost: 0 },
+                        { texto: 'Con Hielo', extraCost: 0 }
+                    ]
+                },
+                {
+                    titulo: 'Opciones de preparación',
+                    tipo: 'checkbox',
+                    opciones: [
+                        { texto: 'Sin Azúcar', extraCost: 0 },
+                        { texto: 'Extra Hielo', extraCost: 0 },
+                        { texto: 'Con Limón y Sal', extraCost: 0 }
+                    ]
+                }
+            ]
+        };
+    }
+
+    if (catID === 2) { // Entradas
+        return {
+            placeholderNota: 'Ej: Sin salsa, extra picante...',
+            grupos: [
+                {
+                    titulo: 'Picante',
+                    tipo: 'radio',
+                    nombreInput: 'chili-level',
                     opciones: [
                         { texto: 'Normal', extraCost: 0, checked: true },
-                        { texto: 'Con Hielo', extraCost: 0 },
-                        { texto: 'Sin Azúcar', extraCost: 0 }
+                        { texto: 'Sin Picante', extraCost: 0 },
+                        { texto: 'Picante Extra', extraCost: 0 }
                     ]
                 },
                 {
                     titulo: 'Extras',
                     tipo: 'checkbox',
                     opciones: [
-                        { texto: 'Porción Grande', extraCost: 15 },
-                        { texto: 'Extra Hielo', extraCost: 0 }
+                        { texto: 'Queso extra', extraCost: 15 },
+                        { texto: 'Salsa especial', extraCost: 10 }
                     ]
                 }
             ]
         };
     }
 
+    if (catID === 4) { // Postres
+        return {
+            placeholderNota: 'Ej: Sin sirope, con doble cuchara...',
+            grupos: [
+                {
+                    titulo: 'Adicionales',
+                    tipo: 'checkbox',
+                    opciones: [
+                        { texto: 'Con Helado de Vainilla', extraCost: 20 },
+                        { texto: 'Chispas de Chocolate', extraCost: 10 },
+                        { texto: 'Cereza Extra', extraCost: 5 }
+                    ]
+                }
+            ]
+        };
+    }
+
+    // Default fallback (Platillos Principales genéricos)
     return {
-        placeholderNota: 'Ej: Sin cebolla, bien cocido...',
+        placeholderNota: 'Ej: Sin condimentos, término especial...',
         grupos: [
             {
-                titulo: 'Término de la carne',
+                titulo: 'Especificaciones',
                 tipo: 'radio',
-                nombreInput: 'cooking-point',
+                nombreInput: 'general-prep',
                 opciones: [
-                    { texto: 'Bien Asada', extraCost: 0, checked: true },
-                    { texto: 'Término Medio', extraCost: 0 }
-                ]
-            },
-            {
-                titulo: 'Acompañamiento',
-                tipo: 'radio',
-                nombreInput: 'side-dish',
-                opciones: [
-                    { texto: 'Gallopinto y Maduro', extraCost: 0, checked: true },
-                    { texto: 'Tajadas Con Queso', extraCost: 0 }
+                    { texto: 'Normal', extraCost: 0, checked: true },
+                    { texto: 'Porción Extra', extraCost: 30 }
                 ]
             }
         ]

@@ -90,6 +90,7 @@ async function inicializarModuloPersonal() {
         formPersonal.addEventListener('submit', async (e) => {
             e.preventDefault();
             await guardarPersonal();
+
         });
     }
 
@@ -394,6 +395,7 @@ async function confirmarCambiarEstado(persona, activo) {
         }
     }
 }
+
 
 // Función para mostrar notificaciones
 function mostrarNotificacion(mensaje, tipo) {

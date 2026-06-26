@@ -9,16 +9,28 @@ export class DetalleVenta {
     #precioUnitario;
     #subtotal;
     #personalizacion;
+    #estadoCocinero;
 
     constructor(data = {}) {
         this.#detalleVentaID = data.detalleVentaID || data.DetalleVentaID || 0;
         this.#ventaID = data.ventaID || data.VentaID || 0;
         this.#platilloID = data.platilloID || data.PlatilloID || 0;
-        this.#nombreProducto = data.nombreProducto || data.NombreProducto || data.nombre || '';
+        this.#nombreProducto = data.nombreProducto || data.NombreProducto || data.nombre || data.nombrePlatillo || '';
         this.#cantidad = data.cantidad || data.Cantidad || 1;
         this.#precioUnitario = Number(data.precioUnitario || data.PrecioUnitario || data.precio_unitario || 0);
         this.#subtotal = Number(data.subtotal || data.Subtotal || this.#cantidad * this.#precioUnitario);
-        this.#personalizacion = data.personalizacion || null;
+        
+        let p = data.personalizacion || data.comentario || data.Comentario || null;
+        if (typeof p === 'string' && p.trim().startsWith('{')) {
+            try {
+                p = JSON.parse(p);
+            } catch (e) {
+                // No es JSON válido, conservar como cadena
+            }
+        }
+        this.#personalizacion = p;
+        
+        this.#estadoCocinero = data.estadoCocinero || data.EstadoCocinero || 'Pendiente';
     }
 
     // Getters
@@ -30,6 +42,7 @@ export class DetalleVenta {
     get precioUnitario() { return this.#precioUnitario; }
     get subtotal() { return this.#subtotal; }
     get personalizacion() { return this.#personalizacion; }
+    get estadoCocinero() { return this.#estadoCocinero; }
 
     // Setters con validación
     set cantidad(valor) {
@@ -47,6 +60,10 @@ export class DetalleVenta {
     // Formatear personalización para mostrar
     get personalizacionTexto() {
         if (!this.#personalizacion) return '';
+        
+        if (typeof this.#personalizacion === 'string') {
+            return this.#personalizacion;
+        }
         
         const { opciones = [], nota = '' } = this.#personalizacion;
         let texto = '';
@@ -68,7 +85,8 @@ export class DetalleVenta {
             platilloID: this.#platilloID,
             cantidad: this.#cantidad,
             precio_unitario: this.#precioUnitario,
-            personalizacion: this.#personalizacion
+            personalizacion: typeof this.#personalizacion === 'object' && this.#personalizacion !== null ? JSON.stringify(this.#personalizacion) : this.#personalizacion,
+            estadoCocinero: this.#estadoCocinero
         };
     }
 }

@@ -137,10 +137,12 @@ async function cargarCategorias() {
         
         selectCategoria.innerHTML = '<option value="">-- Seleccione una categoría --</option>';
         listaCategoriasLocal.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat.categoriaID;
-            option.textContent = cat.nombre;
-            selectCategoria.appendChild(option);
+            if (cat.activo !== false) {
+                const option = document.createElement('option');
+                option.value = cat.categoriaID;
+                option.textContent = cat.nombre;
+                selectCategoria.appendChild(option);
+            }
         });
     } catch (error) {
         console.error('Error cargando categorías:', error);

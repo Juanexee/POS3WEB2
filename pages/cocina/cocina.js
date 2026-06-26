@@ -48,13 +48,36 @@ async function cargarPedidos() {
     renderizarPedidos(pedidos);
 }
 
+function formatComment(commentStr) {
+    if (!commentStr) return '';
+    try {
+        const obj = JSON.parse(commentStr);
+        let parts = [];
+        if (obj.opciones && Array.isArray(obj.opciones)) {
+            obj.opciones.forEach(opt => {
+                if (opt.seleccion) {
+                    const sel = Array.isArray(opt.seleccion) ? opt.seleccion.join(', ') : opt.seleccion;
+                    parts.push(`${opt.grupo}: ${sel}`);
+                }
+            });
+        }
+        if (obj.nota) {
+            parts.push(`Nota: "${obj.nota}"`);
+        }
+        if (parts.length > 0) return parts.join(', ');
+    } catch (e) {
+        // Not a JSON string
+    }
+    return commentStr;
+}
+
 function renderizarPedidos(pedidos) {
     const contenedor = document.getElementById('contenedor-kds');
     if (!contenedor) return;
     
     contenedor.innerHTML = '';
     
-    pedidos.forEach(({ nombrePlatillo, cantidadTotal, tiempoEspera, idsRelacionados, numerosMesas, estado }) => {
+    pedidos.forEach(({ nombrePlatillo, cantidadTotal, tiempoEspera, idsRelacionados, numerosMesas, estado, comentarios }) => {
         const alertaClass = getAlertaClass(tiempoEspera);
         
         let botonesHtml = '';
@@ -78,6 +101,26 @@ function renderizarPedidos(pedidos) {
             `;
         }
 
+        let comentariosHtml = '';
+        if (comentarios) {
+            const comentList = comentarios.split(' | ')
+                .map(c => c.trim())
+                .filter(c => c && c !== 'null' && c !== 'undefined')
+                .map(c => formatComment(c))
+                .filter(c => c);
+                
+            if (comentList.length > 0) {
+                comentariosHtml = `
+                    <div class="kds-notas" style="margin-top: 10px;">
+                        <span>📌 Notas:</span>
+                        <ul>
+                            ${comentList.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
         const tarjeta = document.createElement('div');
         tarjeta.className = `tarjeta-cocina ${alertaClass}`;
         tarjeta.innerHTML = `
@@ -85,9 +128,10 @@ function renderizarPedidos(pedidos) {
             <div class="kds-cuerpo">
                 <h2>${nombrePlatillo}</h2>
                 <p class="kds-tiempo">${tiempoEspera}</p>
-                <p class="kds-mesas" style="margin-top: 8px; font-weight: bold; color: var(--text-color, #fff);">
+                <p class="kds-mesas" style="margin-top: 8px; font-weight: bold; color: #555;">
                     🪑 Mesas: ${numerosMesas || 'N/A'}
                 </p>
+                ${comentariosHtml}
             </div>
             <div class="kds-footer">
                 ${botonesHtml}

@@ -92,6 +92,7 @@
                         <button type="button" class="btn-salir" id="btn-cerrar-detalle">Volver</button>
                         <button type="button" class="btn-cambiar-modal" id="btn-abrir-cambio">Cambiar Mesa</button>
                         <button type="button" class="btn-guardar" id="btn-confirmar-entrega">Entrega</button>
+                        <button type="button" class="btn-guardar" id="btn-agregar-pedido-mesa" style="background-color: #ff6b00; color: #fff; border-color: #ff6b00;">🛒 Agregar Platillos</button>
                         <button type="button" class="btn-guardar" id="btn-cobrar-mesa" style="background-color: #ffc107; color: #000; border-color: #ffc107;">💰 Cobrar Cuenta</button>
                     </div>
                 </div>
@@ -173,8 +174,67 @@
                 </div>
             </div>
         </div>
+        <div class="modal-overlay" id="modal-agregar-pedido" style="display: none; z-index: 1050;">
+            <div class="modal-content" style="max-width: 600px; width: 90%;">
+                <header class="modal-header-estandar">
+                    <h3 id="agregar-pedido-titulo">🛒 Agregar Platillos</h3>
+                </header>
+                
+                <div class="modal-body">
+                    <div class="fila-formulario" style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px;">
+                        <div class="campo" style="flex: 1;">
+                            <label for="select-platillo-pedido">Seleccionar Platillo:</label>
+                            <select id="select-platillo-pedido" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;"></select>
+                        </div>
+                        <div class="campo" style="width: 80px;">
+                            <label for="cant-platillo-pedido">Cant:</label>
+                            <input type="number" id="cant-platillo-pedido" value="1" min="1" max="99" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+                        </div>
+                        <button type="button" id="btn-agregar-platillo-lista" class="btn-agregar-top" style="height: 38px; margin-bottom: 0; padding: 0 15px; background-color: #ff6b00; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Add</button>
+                    </div>
+
+                    <div class="fila-formulario" style="margin-bottom: 20px;">
+                        <div class="campo">
+                            <label for="comentario-platillo-pedido">Instrucciones Especiales / Comentario (opcional):</label>
+                            <input type="text" id="comentario-platillo-pedido" placeholder="Ej: sin cebolla, salsa aparte..." style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 10px; border-bottom: 2px solid #ff6b00; padding-bottom: 5px;">Detalle del Pedido</h4>
+                        <div style="max-height: 200px; overflow-y: auto; background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #eee;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                                <thead>
+                                    <tr style="background: #e6e6e6; color: #333;">
+                                        <th style="padding: 6px; text-align: left;">Platillo</th>
+                                        <th style="padding: 6px; text-align: center; width: 60px;">Cant</th>
+                                        <th style="padding: 6px; text-align: right; width: 80px;">Precio</th>
+                                        <th style="padding: 6px; text-align: right; width: 80px;">Total</th>
+                                        <th style="padding: 6px; text-align: center; width: 40px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-platillos-agregados">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 10px; color: #888; font-style: italic;">No hay platillos en la lista</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="text-align: right; margin-top: 10px; font-size: 1.1rem; font-weight: bold; color: #333;">
+                            Total: <span id="total-pedido-agregar" style="color: #ff6b00;">C$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="botones-acciones">
+                        <button type="button" class="btn-salir" id="btn-cancelar-pedido">Cancelar</button>
+                        <button type="button" class="btn-guardar" id="btn-confirmar-pedido-mesero">Confirmar Pedido</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
+    <script type="module" src="../../shared/utils/menu.js"></script>
     <script type="module" src="./mesas.js"></script>
 </body>
 </html>

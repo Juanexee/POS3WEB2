@@ -4,7 +4,8 @@ import {
     obtenerCategorias,
     insertarCategoria, 
     actualizarCategoria,
-    eliminarCategoria 
+    eliminarCategoria,
+    activarCategoria
 } from '../../shared/services/categoriaService.js';
 
 // Variables globales
@@ -15,6 +16,7 @@ let inputId;
 let inputNombre;
 let btnAbrirAgregar;
 let inputBuscar;
+let chkMostrarInactivos;
 let listaCompletaCategorias = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -30,6 +32,7 @@ function inicializarModuloCategorias() {
     inputNombre = document.getElementById('nombre-categoria');
     btnAbrirAgregar = document.getElementById('btn-agregar-platillo');
     inputBuscar = document.querySelector('.input-busqueda input') || document.getElementById('input-buscar-categoria');
+    chkMostrarInactivos = document.getElementById('chk-mostrar-inactivos');
 
     // Evento: Abrir modal para agregar
     if (btnAbrirAgregar) {
@@ -104,6 +107,14 @@ function inicializarModuloCategorias() {
         });
     }
 
+    // Evento: Mostrar desactivadas checkbox
+    if (chkMostrarInactivos) {
+        chkMostrarInactivos.addEventListener('change', () => {
+            const texto = inputBuscar ? inputBuscar.value.toLowerCase().trim() : '';
+            filtrarYMostrarTablas(texto);
+        });
+    }
+
     // Cargar datos iniciales
     cargarDatosEnTabla();
 }
@@ -115,11 +126,12 @@ async function cargarDatosEnTabla() {
         tablaCuerpo.innerHTML = '<tr><td colspan="3" style="text-align:center;">Cargando categorías...</td></tr>';
         
         listaCompletaCategorias = await obtenerCategorias();
-        renderizarFilas(listaCompletaCategorias);
+        const texto = inputBuscar ? inputBuscar.value.toLowerCase().trim() : '';
+        filtrarYMostrarTablas(texto);
         
     } catch (error) {
         console.error('Error cargando categorías:', error);
-        tablaCuerpo.innerHTML = `<td><td colspan="3" style="text-align:center; color:#dc3545;">⚠️ ${error.message}</td></tr>`;
+        tablaCuerpo.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#dc3545;">⚠️ ${error.message}</td></tr>`;
     }
 }
 
@@ -135,6 +147,7 @@ function renderizarFilas(categorias) {
     categorias.forEach((cat, index) => {
         const currentID = cat.categoriaID;
         const currentNombre = cat.nombre;
+        const currentActivo = cat.activo !== false;
 
         const fila = document.createElement('tr');
         fila.innerHTML = `
@@ -142,7 +155,10 @@ function renderizarFilas(categorias) {
             <td>${escapeHtml(currentNombre)}</td>
             <td style="text-align: right; padding-right: 30px;">
                 <button class="btn-editar" data-id="${currentID}" data-nombre="${currentNombre}">✏️ Editar</button>
-                <button class="btn-desactivar" data-id="${currentID}" data-nombre="${currentNombre}">🔒 Desactivar</button>
+                ${currentActivo 
+                    ? `<button class="btn-desactivar" data-id="${currentID}" data-nombre="${currentNombre}">🔒 Desactivar</button>`
+                    : `<button class="btn-activar" data-id="${currentID}" data-nombre="${currentNombre}">✅ Activar</button>`
+                }
             </td>
         `;
 
@@ -159,34 +175,59 @@ function renderizarFilas(categorias) {
             if (modalCategoria) modalCategoria.style.display = 'flex';
         });
 
-        // Evento Eliminar
+        // Evento Desactivar
         const btnDelete = fila.querySelector('.btn-desactivar');
-        btnDelete.addEventListener('click', async () => {
-            if (confirm(`¿Estás seguro que deseas eliminar la categoría "${currentNombre}"?`)) {
-                try {
-                    await eliminarCategoria(currentID);
-                    alert('✅ Categoría eliminada/desactivada correctamente.');
-                    await cargarDatosEnTabla();
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert(`⚠️ No se pudo eliminar: ${error.message}`);
+        if (btnDelete) {
+            btnDelete.addEventListener('click', async () => {
+                if (confirm(`¿Estás seguro que deseas desactivar la categoría "${currentNombre}"?`)) {
+                    try {
+                        await eliminarCategoria(currentID);
+                        alert('✅ Categoría desactivada correctamente.');
+                        await cargarDatosEnTabla();
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert(`⚠️ No se pudo desactivar: ${error.message}`);
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        // Evento Activar
+        const btnActivate = fila.querySelector('.btn-activar');
+        if (btnActivate) {
+            btnActivate.addEventListener('click', async () => {
+                if (confirm(`¿Deseas activar la categoría "${currentNombre}"?`)) {
+                    try {
+                        await activarCategoria(currentID);
+                        alert('✅ Categoría activada correctamente.');
+                        await cargarDatosEnTabla();
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert(`⚠️ No se pudo activar: ${error.message}`);
+                    }
+                }
+            });
+        }
 
         tablaCuerpo.appendChild(fila);
     });
 }
 
 function filtrarYMostrarTablas(texto) {
-    if (!texto) {
-        renderizarFilas(listaCompletaCategorias);
-        return;
+    const mostrarInactivos = chkMostrarInactivos ? chkMostrarInactivos.checked : false;
+    
+    let filtradas = [...listaCompletaCategorias];
+    
+    if (!mostrarInactivos) {
+        filtradas = filtradas.filter(cat => cat.activo !== false);
     }
     
-    const filtradas = listaCompletaCategorias.filter(cat => 
-        cat.nombre && cat.nombre.toLowerCase().includes(texto)
-    );
+    if (texto) {
+        filtradas = filtradas.filter(cat => 
+            cat.nombre && cat.nombre.toLowerCase().includes(texto)
+        );
+    }
+    
     renderizarFilas(filtradas);
 }
 
