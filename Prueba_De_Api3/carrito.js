@@ -1,7 +1,7 @@
 // pages/carrito/carrito.js
 
-import VentaService from '../shared/services/ventaService.js';
-import SesionService from '../shared/services/SesionService.js';
+import VentaService from './shared/services/ventaService.js';
+import SesionService from './shared/services/SesionService.js';
 
 const ventaService = new VentaService();
 const sesionService = new SesionService();
@@ -28,7 +28,7 @@ function cargarCarrito() {
         cartList.innerHTML = `
             <div style="text-align: center; padding: 40px 20px; color: #888;">
                 <p style="font-size: 1.2rem; margin-bottom: 20px;">Tu carrito está vacío 🛒</p>
-                <a href="menu.html" class="btn-yellow" style="display: inline-block; max-width: 250px; text-decoration: none;">Ver el Menú</a>
+                <a href="index.html" class="btn-yellow" style="display: inline-block; max-width: 250px; text-decoration: none;">Ver el Menú</a>
             </div>
         `;
         if (summaryBlock) summaryBlock.style.display = 'none';
@@ -132,7 +132,7 @@ async function procesarPedido() {
         
         try {
             // Importación dinámica de MesaService para buscar la mesa
-            const MesaService = (await import('../shared/services/mesaService.js')).default;
+            const MesaService = (await import('./shared/services/mesaService.js')).default;
             const mesaService = new MesaService();
             const mesas = await mesaService.obtenerTodas();
             
@@ -190,7 +190,7 @@ async function procesarPedido() {
         if (result.success) {
             alert('✅ ¡Pedido enviado a cocina correctamente!');
             localStorage.removeItem('carrito');
-            window.location.href = 'menu.html';
+            window.location.href = 'index.html';
         } else {
             let errorMsg = result.message || 'Error desconocido';
             let detailMsg = '';

@@ -1,8 +1,8 @@
 // pages/menu/menu.js
 
-import PlatilloService from '../shared/services/platilloService.js';
-import CategoriaService from '../shared/services/categoriaService.js';
-import SesionService from '../shared/services/SesionService.js';
+import PlatilloService from './shared/services/platilloService.js';
+import CategoriaService from './shared/services/categoriaService.js';
+import SesionService from './shared/services/SesionService.js';
 
 const platilloService = new PlatilloService();
 const categoriaService = new CategoriaService();

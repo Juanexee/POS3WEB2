@@ -1,6 +1,6 @@
 // pages/personalizar/personalizar.js
 
-import PlatilloService from '../shared/services/platilloService.js';
+import PlatilloService from './shared/services/platilloService.js';
 
 const platilloService = new PlatilloService();
 
@@ -11,7 +11,7 @@ let precioTotalActual = 0;
 document.addEventListener('DOMContentLoaded', async () => {
     const id = new URLSearchParams(window.location.search).get('id');
     if (!id) {
-        window.location.href = 'menu.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     precioTotalActual = precioBase;
 
     document.getElementById('platillo-nombre').innerText = platilloActual.nombre;
-    document.getElementById('platillo-imagen').src = platilloActual.imagenBase64 || '../shared/images/placeholder.png';
+    document.getElementById('platillo-imagen').src = platilloActual.imagenBase64 || './shared/images/placeholder.png';
     document.getElementById('platillo-precio').innerText = `C$ ${precioBase}`;
 
     const opcionesContenedor = document.getElementById('opciones-contenedor');
