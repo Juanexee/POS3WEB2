@@ -1,0 +1,103 @@
+/* shared/styles/platillo.css */
+
+/* Estilos específicos para el módulo de platillos */
+.estado-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.estado-activo {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.estado-inactivo {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Botones de acción estilizados por shared.css */
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    width: 500px;
+    max-width: 90%;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: #ff6b00;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.fila-formulario {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.campo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.campo label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.campo input, .campo select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.botones-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px;
+    border-top: 1px solid #eee;
+}
+
+.btn-guardar {
+    background: #ff6b00;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-salir {
+    background: #e0e0e0;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}

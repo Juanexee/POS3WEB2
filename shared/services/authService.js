@@ -1,45 +1,104 @@
 // shared/services/authService.js
-import { BASE_URL } from './config.js';
 
-/**
- * Envia las credenciales a la API para verificar el acceso.
- * @param {string} nombreUsuario 
- * @param {string} password 
- * @returns {Promise<object>} Datos de respuesta de la API (incluye el Token)
- */
-export async function login(nombreUsuario, password) {
-    const endpoint = `${BASE_URL}/api/Auth/login`;
+import HttpService from './HttpService.js';
 
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ nombreUsuario, password })
-    });
-
-    if (!response.ok) {
-        if (response.status === 401) throw new Error('Usuario o contraseña incorrectos.');
-        if (response.status === 400) throw new Error('Faltan campos obligatorios.');
-        throw new Error('Error de conexión con el servidor.');
+export default class AuthService extends HttpService {
+    
+    constructor() {
+        super();
+        this.endpointBase = '/api/Auth';
     }
 
-    const data = await response.json(); // Retorna el JSON con el token JWT
-    return data; 
+    /**
+     * Envía las credenciales a la API para verificar el acceso.
+     * @param {string} nombreUsuario 
+     * @param {string} password 
+     * @returns {Promise<object>}
+     */
+    async login(nombreUsuario, password) {
+        const response = await this.post(`${this.endpointBase}/login`, { nombreUsuario, password });
+        
+        if (response.success === false) {
+            if (response.status === 401) throw new Error('Usuario o contraseña incorrectos.');
+            if (response.status === 400) throw new Error('Faltan campos obligatorios.');
+            throw new Error(response.message || 'Error de conexión con el servidor.');
+        }
+        
+        if (response.token) {
+            this.guardarSesion(response.token, nombreUsuario);
+        }
+        
+        return response;
+    }
+    
+    guardarSesion(token, usuario) {
+        localStorage.setItem('token_mimi', token);
+        localStorage.setItem('usuario_activo', usuario);
+        localStorage.setItem('authToken', token);
+    }
+
+    cerrarSesion() {
+        localStorage.removeItem('token_mimi');
+        localStorage.removeItem('usuario_activo');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('sesionActiva');
+        localStorage.removeItem('mesaActual');
+    }
+
+    estaAutenticado() {
+        const token = localStorage.getItem('token_mimi');
+        return !!token;
+    }
+
+    obtenerUsuarioActual() {
+        return localStorage.getItem('usuario_activo');
+    }
+
+    obtenerUsuarioIdActual() {
+        const token = localStorage.getItem('token_mimi') || localStorage.getItem('authToken');
+        if (!token) return null;
+        try {
+            const parts = token.split('.');
+            if (parts.length !== 3) return null;
+            const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+            const id = payload.nameid || 
+                       payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || 
+                       payload.sub;
+            return id ? parseInt(id) : null;
+        } catch (e) {
+            console.error('Error al decodificar token JWT:', e);
+            return null;
+        }
+    }
 }
 
-/**
- * Guarda de forma segura el Token en el almacenamiento local del navegador
- */
+// Exportaciones para compatibilidad con login.js
+export async function login(nombreUsuario, password) {
+    const authService = new AuthService();
+    return await authService.login(nombreUsuario, password);
+}
+
 export function guardarSesion(token, usuario) {
-    localStorage.setItem('token_mimi', token);
-    localStorage.setItem('usuario_activo', usuario);
+    const authService = new AuthService();
+    authService.guardarSesion(token, usuario);
 }
 
-/**
- * Cierra la sesión eliminando las credenciales del navegador
- */
 export function cerrarSesion() {
-    localStorage.removeItem('token_mimi');
-    localStorage.removeItem('usuario_activo');
+    const authService = new AuthService();
+    authService.cerrarSesion();
+}
+
+export function estaAutenticado() {
+    const authService = new AuthService();
+    return authService.estaAutenticado();
+}
+
+export function obtenerUsuarioActual() {
+    const authService = new AuthService();
+    return authService.obtenerUsuarioActual();
+}
+
+export function obtenerUsuarioIdActual() {
+    const authService = new AuthService();
+    return authService.obtenerUsuarioIdActual();
 }

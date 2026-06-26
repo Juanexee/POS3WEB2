@@ -1,0 +1,83 @@
+<!-- pages/admin/generar-qr.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar QR - Mesas | El Rancho de la Mimi</title>
+    
+    <!-- Estilos compartidos -->
+    <link rel="stylesheet" href="../../shared/styles/shared.css">
+    <link rel="stylesheet" href="../../shared/styles/admin-qr.css">
+    
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <aside>
+        <div class="perfil">
+            <img src="../../shared/images/USER1.png" alt="Usuario">
+            <p id="nombre-usuario-actual">Administrador</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="../../pages/admin/inicio.html">🏠 Inicio</a></li>
+                <li><a href="../../pages/categorias/Categoria.html">📁 Categorías</a></li>
+                <li><a href="../../pages/platillos/Platillo.html">🍔 Platillos</a></li>
+                <li><a href="../../pages/mesas/Mesas.html">🪑 Mesas</a></li>
+                <li><a href="../../pages/personal/personal.html">👥 Personal</a></li>
+                <li><a href="../../pages/cocina/cocina.html">🍳 Cocina</a></li>
+                <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
+                <li><a href="../../pages/Rol/Roles.html">🔐 Roles</a></li>
+                <li><a href="../../pages/admin/generar-qr.html" class="active">📱 Generar QR</a></li>
+                <li><a href="#" id="btn-cerrar-sesion" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; color: #ff6b00;">🚪 Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="qr-header">
+            <div class="qr-header-info">
+                <h1><i class="fas fa-qrcode"></i> Códigos QR para Mesas</h1>
+                <p>Genera códigos QR para que los clientes puedan ordenar desde su mesa</p>
+            </div>
+            <div class="qr-header-actions">
+                <button class="btn-imprimir-todos" id="btn-imprimir-todos">
+                    <i class="fas fa-print"></i> Imprimir Todos
+                </button>
+                <button class="btn-refrescar" id="btn-refrescar">
+                    <i class="fas fa-sync-alt"></i> Refrescar
+                </button>
+            </div>
+        </div>
+        
+        <div class="qr-stats">
+            <div class="stat-card">
+                <i class="fas fa-chair"></i>
+                <div class="stat-info">
+                    <span class="stat-number" id="total-mesas">0</span>
+                    <span class="stat-label">Mesas Registradas</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-qrcode"></i>
+                <div class="stat-info">
+                    <span class="stat-number" id="total-qr">0</span>
+                    <span class="stat-label">QR Generados</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="qr-container" class="qr-grid">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i> Cargando mesas...
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script type="module" src="../../shared/utils/menu.js"></script>
+    <script type="module" src="./generar-qr.js"></script>
+</body>
+</html>

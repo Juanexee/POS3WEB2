@@ -18,9 +18,18 @@ body {
 @media (min-width: 768px) {
     body {
         grid-template-columns: 250px 1fr;
+        height: 100vh !important;
+        overflow: hidden !important;
     }
     aside {
-        min-height: 100vh;
+        height: 100vh !important;
+        position: sticky !important;
+        top: 0 !important;
+        overflow-y: auto !important;
+    }
+    main {
+        height: 100vh !important;
+        overflow-y: auto !important;
     }
 }
 
@@ -132,8 +141,82 @@ tbody tr:hover { background-color: #f3f4f6; }
 .btn-primary { background-color: #0e0e0e; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 24px; cursor: pointer; }
 .btn-guardar { background-color: #0e0e0e; color: white; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer;justify-content: center; margin-top: 40px;margin-bottom: 10px;}
 .btn-salir { background-color: #e0e0e0; color: #333; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;justify-content: center; margin-top: 40px;margin-bottom: 10px; }
-.btn-edit { background-color: #0e0e0e; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
-.btn-delete { background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+/* Botones de Tabla: Editar (✏️) */
+.btn-edit, .btn-editar, .btn-editar-rapido {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #0e0e0e !important;
+    color: white !important;
+    border: none !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important; /* Pill shape */
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    gap: 5px !important;
+    margin: 2px 4px !important;
+    white-space: nowrap !important;
+}
+
+.btn-edit:hover, .btn-editar:hover, .btn-editar-rapido:hover {
+    background-color: #333333 !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+/* Botones de Tabla: Eliminar/Desactivar (🔒 / 🗑️) */
+.btn-delete, .btn-eliminar, .btn-eliminar-rapido, .btn-desactivar {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important; /* Pill shape */
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    gap: 5px !important;
+    margin: 2px 4px !important;
+    white-space: nowrap !important;
+}
+
+.btn-delete:hover, .btn-eliminar:hover, .btn-eliminar-rapido:hover, .btn-desactivar:hover {
+    background-color: #c82333 !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+/* Botones de Tabla: Activar (✅) */
+.btn-activar, .btn-activate {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #28a745 !important;
+    color: white !important;
+    border: none !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important; /* Pill shape */
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    gap: 5px !important;
+    margin: 2px 4px !important;
+    white-space: nowrap !important;
+}
+
+.btn-activar:hover, .btn-activate:hover {
+    background-color: #218838 !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+/* Evitar que los botones de acción se dividan en varias líneas */
+table td:last-child {
+    white-space: nowrap !important;
+}
 
 
 /* ============================================================
@@ -615,4 +698,48 @@ tbody tr:hover { background-color: #f3f4f6; }
 
 .kds-notas ul li strong {
     color: #0e0e0e;
+}
+
+/* Botones de Tabla Factura: Ver, Imprimir, Cobrar */
+.btn-view, .btn-print, .btn-pay {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important; /* Pill shape */
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    gap: 5px !important;
+    margin: 2px 4px !important;
+    white-space: nowrap !important;
+}
+
+.btn-view {
+    background-color: #4b5563 !important; /* Gris */
+    color: white !important;
+}
+.btn-view:hover {
+    background-color: #374151 !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+.btn-print {
+    background-color: #0e0e0e !important; /* Negro */
+    color: white !important;
+}
+.btn-print:hover {
+    background-color: #333333 !important;
+    transform: translateY(-1px) scale(1.02) !important;
+}
+
+.btn-pay {
+    background-color: #ffc107 !important; /* Amarillo/Oro */
+    color: #000000 !important;
+}
+.btn-pay:hover {
+    background-color: #e0a800 !important;
+    transform: translateY(-1px) scale(1.02) !important;
 }

@@ -4,242 +4,178 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Facturas - El Rancho de la Mimi</title>
+    <link rel="stylesheet" href="../../shared/styles/shared.css">
     <link rel="stylesheet" href="../../shared/styles/facturas.css">
-    <link rel="stylesheet" href="../../shared/styles/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-     <aside>
+    <aside>
         <div class="perfil">
             <img src="../../shared/images/USER1.png" alt="Usuario">
-            <p>user1</p>
+            <p id="nombre-usuario-actual">user1</p>
         </div>
         <nav>
             <ul>
-                <li><a href="../../pages/admin/inicio.html">🏠Inicio</a></li>
+                <li><a href="../../pages/admin/inicio.html">🏠 Inicio</a></li>
                 <li><a href="../../pages/categorias/Categoria.html">📁 Categorías</a></li>
                 <li><a href="../../pages/platillos/Platillo.html">🍔 Platillos</a></li>
                 <li><a href="../../pages/mesas/Mesas.html">🪑 Mesas</a></li>
-                <li><a href="../../pages/personal/Personal.html">👥 Personal</a></li>
-                <li><a href="../../pages/cocina/Cocina.html">🍳 Cocina</a></li>
+                <li><a href="../../pages/personal/personal.html">👥 Personal</a></li>
+                <li><a href="../../pages/cocina/cocina.html">🍳 Cocina</a></li>
                 <li><a href="../../pages/facturas/Factura.html" class="active">📄 Facturas</a></li>
+                <li><a href="../../pages/Rol/Roles.html">🔐 Roles</a></li>
+                <li><a href="../../pages/admin/generar-qr.html">📱 Generar QR</a></li>
+                <li><a href="#" id="btn-cerrar-sesion" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; color: #ff6b00;">🚪 Cerrar Sesión</a></li>
             </ul>
         </nav>
     </aside>
 
-    <div class="layout-container">
-        <main class="main-content">
-            <section class="invoice-section">
-                <h1 class="section-title">Registro de Facturación</h1>
-                
-                <header class="content-header">
-                    <div class="contenedor-buscar">
-                        <div class="input-busqueda">
-                            <span>🔍</span>
-                            <input type="text" id="input-buscar-factura" placeholder="Buscar...">
-                        </div>
-                    </div>
-                </header>
-
-                <div class="invoice-cards-container">
-                    
-                    <div class="invoice-card status-paid">
-                        <div class="card-header">
-                            <span class="invoice-number">#1</span>
-                            <span class="badge status-badge">Pagado</span>
-                        </div>
-                        <div class="card-body">
-                            <p><strong>Mesa:</strong> Mesa 2</p>
-                            <p><strong>Mesero:</strong> Juan</p>
-                            <p><strong>Tipo:</strong> Mesa</p>
-                            <p class="invoice-total">Total: C$ 520.00</p>
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn-action btn-view" title="Ver / Cobrar Factura"><i class="fa-solid fa-file-invoice"></i></button>
-                            <button class="btn-action btn-edit" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="btn-action btn-print" title="Imprimir"><i class="fa-solid fa-print"></i></button>
-                            <button class="btn-action btn-delete" title="Anular / Eliminar"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="invoice-card status-complete">
-                        <div class="card-header">
-                            <span class="invoice-number">#2</span>
-                            <span class="badge status-badge">Completado</span>
-                        </div>
-                        <div class="card-body">
-                            <p><strong>Mesa:</strong> Mesa 1</p>
-                            <p><strong>Mesero:</strong> —</p>
-                            <p><strong>Tipo:</strong> Mesa</p>
-                            <p class="invoice-total">Total: C$ 600.00</p>
-                        </div>
-                        <div class="card-actions">
-                            <button class="btn-action btn-view" title="Ver / Cobrar Factura"><i class="fa-solid fa-file-invoice"></i></button>
-                            <button class="btn-action btn-edit" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="btn-action btn-print" title="Imprimir"><i class="fa-solid fa-print"></i></button>
-                            <button class="btn-action btn-delete" title="Anular / Eliminar"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="invoice-table-container">
-                    <table class="invoice-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Mesa</th>
-                                <th>Mesero</th>
-                                <th>Tipo</th>
-                                <th>Estado</th>
-                                <th>Total</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="row-paid">
-                                <td>1</td>
-                                <td>Mesa 1</td>
-                                <td>Juan</td>
-                                <td>Mesa</td>
-                                <td><span class="badge status-badge">Pagado</span></td>
-                                <td class="text-bold">C$ 520.00</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn-action btn-view" title="Ver / Cobrar"><i class="fa-solid fa-file-invoice"></i></button>
-                                        <button class="btn-action btn-edit" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-                                        <button class="btn-action btn-print" title="Imprimir"><i class="fa-solid fa-print"></i></button>
-                                        <button class="btn-action btn-delete" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="row-complete">
-                                <td>2</td>
-                                <td>Mesa 2</td>
-                                <td>Mario</td>
-                                <td>Mesa</td>
-                                <td><span class="badge status-badge">Completado</span></td>
-                                <td class="text-bold">C$ 600.00</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn-action btn-view" title="Ver / Cobrar"><i class="fa-solid fa-file-invoice"></i></button>
-                                        <button class="btn-action btn-edit" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-                                        <button class="btn-action btn-print" title="Imprimir"><i class="fa-solid fa-print"></i></button>
-                                        <button class="btn-action btn-delete" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <div class="modal-overlay" id="modal-factura" style="display: none;">
-        <div class="modal-card">
-            <header class="modal-header">
-                <div class="modal-brand">
-                    <img src="../../📂 shared/📂 images/mimi2.png" alt="Logo La Mimi" class="modal-logo">
-                    <h2>Factura</h2>
-                </div>
+    <main>
+        <section class="invoice-section">
+            <header>
+                <h1>Registro de Facturación</h1>
             </header>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Importe de Factura</label>
-                    <input type="text" value="520.00" readonly class="input-disabled">
-                </div>
-                <div class="form-group">
-                    <label for="pago-recibido">Pago Recibido</label>
-                    <input type="number" id="pago-recibido" placeholder="C$ 0.00" autofocus>
-                </div>
-                <div class="form-group">
-                    <label>Cambio</label>
-                    <input type="text" value="C$ 0.00" readonly class="input-disabled text-highlight">
-                </div>
-            </div>
-            <footer class="modal-footer">
-                <button class="btn-modal btn-save">Guardar</button>
-                <button class="btn-modal btn-close">Salir</button>
-            </footer>
-        </div>
-    </div>
-<div class="modal-overlay"style="display: none;">
-        <div class="modal-content">
             
-            <header class="modal-header header-factura">
-                <div class="modal-brand">
-                    <img src="../images/mimi2.png" alt="Logo La Mimi" class="modal-logo">
-                    <div class="modal-titulo-sub">
-                        <h3 id="modal-factura-titulo">Detalle de Factura</h3>
-                        <span id="modal-factura-numero" class="txt-naranja">#0001</span>
-                    </div>
+            <div class="herramientas">
+                <div class="input-busqueda">
+                    🔍 <input type="text" id="input-buscar-factura" placeholder="Buscar por #, mesero o mesa...">
                 </div>
-            </header>
+                <button id="btn-refrescar" class="btn-refrescar" title="Refrescar lista">
+                    <i class="fas fa-sync-alt"></i> Refrescar
+                </button>
+            </div>
 
-            <main class="modal-body">
-                <form id="form-factura-transaccion">
+            <!-- Vista Móvil: Tarjetas -->
+            <div id="invoice-cards-container" class="invoice-cards-container">
+                <div class="loading-cards">Cargando facturas...</div>
+            </div>
+
+            <!-- Vista Desktop: Tabla -->
+            <div class="invoice-table-container">
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th># Factura</th>
+                            <th>Fecha</th>
+                            <th>Mesa</th>
+                            <th>Cajero/Mesero</th>
+                            <th>Estado</th>
+                            <th>Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoice-table-body">
+                        <tr>
+                            <td colspan="7" class="text-center">Cargando facturas...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="paginacion">
+                <button id="btn-prev" disabled>Anterior</button>
+                <span id="info-pagina">Página 1 de 1</span>
+                <button id="btn-next" disabled>Siguiente</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL DETALLE DE FACTURA / COBRO -->
+    <div class="modal-overlay" id="modal-detalle-factura" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header-estandar">
+                <h3 id="modal-titulo">🧾 Detalle de Factura</h3>
+                <span id="modal-factura-numero" class="factura-numero"></span>
+            </div>
+
+            <div class="modal-body">
+                <form id="form-cobro">
+                    <input type="hidden" id="venta-id" value="">
                     
+                    <div class="info-factura">
+                        <div class="info-row">
+                            <span class="info-label">📅 Fecha:</span>
+                            <span id="factura-fecha" class="info-value">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">🪑 Mesa:</span>
+                            <span id="factura-mesa" class="info-value">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">👤 Atendido por:</span>
+                            <span id="factura-usuario" class="info-value">-</span>
+                        </div>
+                    </div>
+
+                    <div class="detalle-productos">
+                        <h4>📋 Productos Consumidos</h4>
+                        <div id="lista-productos" class="lista-productos">
+                            <p class="text-center">Cargando productos...</p>
+                        </div>
+                    </div>
+
+                    <div class="totales-factura">
+                        <div class="total-row">
+                            <span class="total-label">TOTAL A PAGAR:</span>
+                            <span id="factura-total" class="total-valor">C$ 0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="separador"></div>
+
                     <div class="fila-formulario">
                         <div class="campo">
-                            <label for="factura-mesa">Mesa / Ubicación</label>
-                            <input type="text" id="factura-mesa" value="Mesa 2" readonly class="input-readonly">
+                            <label for="pago-recibido">💰 Pago Recibido (C$)</label>
+                            <input type="number" id="pago-recibido" step="0.01" placeholder="0.00" autofocus>
                         </div>
                         <div class="campo">
-                            <label for="factura-mesero">Mesero Atendiendo</label>
-                            <input type="text" id="factura-mesero" value="Juan Morales" readonly class="input-readonly">
+                            <label>💵 Cambio a Entregar</label>
+                            <input type="text" id="cambio-calculo" readonly class="input-cambio" value="C$ 0.00">
                         </div>
                     </div>
 
-                   <div class="form-group">
-                        <label>Importe de Factura (C$)</label>
-                       <input type="text" value="520.00" readonly class="input-disabled txt-bold-total">
+                    <div class="metodo-pago">
+                        <label>💳 Método de Pago</label>
+                        <select id="metodo-pago">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="Transferencia">Transferencia</option>
+                        </select>
                     </div>
 
-                  <div class="fila-formulario">
-                   <div class="campo">
-                     <label for="pago-recibido">Pago Recibido (Córdobas)</label>
-                     <input type="number" id="pago-recibido" placeholder="Ej: C$ 600" autofocus>
-                            </div>
-                   <div class="campo">
-                              <label>Cambio a Entregar</label>
-                         <input type="text" value="C$ 0.00" readonly class="input-disabled text-highlight">
-                             </div>
-                  </div>
-                
-
-                    <div class="ticket-preview-box" id="ticket-termico-preview" style="display: none;">
-                        <div class="ticket-header-print">
-                            <p class="ticket-bold">EL RANCHO DE LA MIMI</p>
-                            <p>Jinotepe, Carazo, Nicaragua</p>
-                            <p>--------------------------------</p>
-                        </div>
-                        <div class="ticket-body-print">
-                            <p>Cant. Descripción       Total</p>
-                            <p>1    Alitas Personales  C$ 240.00</p>
-                            <p>2    Bebidas Naturales  C$ 100.00</p>
-                            <p>1    Hamburguesa Mimi   C$ 180.00</p>
-                            <p>--------------------------------</p>
-                        </div>
-                        <div class="ticket-footer-print">
-                            <p class="ticket-bold">TOTAL: C$ 520.00</p>
-                            <p>¡Gracias por su visita!</p>
-                        </div>
+                    <div class="botones-acciones">
+                        <button type="button" class="btn-salir" id="btn-cerrar-modal">Cancelar</button>
+                        <button type="submit" class="btn-guardar" id="btn-confirmar-cobro">
+                            <i class="fas fa-cash-register"></i> Confirmar Cobro
+                        </button>
                     </div>
-
                 </form>
-            </main>
-
-            <footer class="botones-acciones">
-                <button type="submit" form="form-factura-transaccion" id="btn-factura-accion-principal" class="btn-guardar" formaction="../../pages/facturas/Factura.html">
-                    <i class="fa-solid fa-cash-register"></i> Guardar Cobro
-                </button>
-                <button type="button" class="btn-salir" onclick="window.location.href='../../pages/facturas/Factura.html'">
-                    Salir
-                </button>
-            </footer>
-
+            </div>
         </div>
     </div>
+
+    <!-- MODAL PARA IMPRESIÓN (TICKET) -->
+    <div class="modal-overlay" id="modal-ticket" style="display: none;">
+        <div class="modal-content ticket-modal">
+            <div class="modal-header-estandar">
+                <h3>🧾 Ticket de Venta</h3>
+            </div>
+            <div class="modal-body">
+                <div id="ticket-contenido" class="ticket-contenido">
+                    <!-- Aquí se renderiza el ticket -->
+                </div>
+                <div class="botones-acciones">
+                    <button class="btn-salir" id="btn-cerrar-ticket">Cerrar</button>
+                    <button class="btn-guardar" id="btn-imprimir-ticket">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../../shared/utils/menu.js"></script>
+    <script type="module" src="./Factura.js"></script>
 </body>
 </html>

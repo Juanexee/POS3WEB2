@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal - Rancho de la Mimi</title>
+    <title>Roles - Rancho de la Mimi</title>
     <link rel="stylesheet" href="../../shared/styles/shared.css">
-    <link rel="stylesheet" href="../../shared/styles/personal.css">
+    <link rel="stylesheet" href="../../shared/styles/roles.css">
 </head>
 
 <body>
@@ -22,25 +22,26 @@
                 <li><a href="../../pages/categorias/Categoria.html">📁 Categorías</a></li>
                 <li><a href="../../pages/platillos/Platillo.html">🍔 Platillos</a></li>
                 <li><a href="../../pages/mesas/Mesas.html">🪑 Mesas</a></li>
-                <li><a href="../../pages/personal/personal.html" class="active">👥 Personal</a></li>
+                <li><a href="../../pages/personal/personal.html">👥 Personal</a></li>
                 <li><a href="../../pages/cocina/cocina.html">🍳 Cocina</a></li>
                 <li><a href="../../pages/facturas/Factura.html">📄 Facturas</a></li>
-                <li><a href="../../pages/Rol/Roles.html">🔐 Roles</a></li>
+                <li><a href="../../pages/Rol/Roles.html" class="active">🔐 Roles</a></li>
                 <li><a href="../../pages/admin/generar-qr.html">📱 Generar QR</a></li>
                 <li><a href="#" id="btn-cerrar-sesion" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; color: #ff6b00;">🚪 Cerrar Sesión</a></li>
             </ul>
         </nav>
     </aside>
 
-    <!-- 🟢 CONTENIDO -->
+    <!-- 🟢 CONTENIDO PRINCIPAL -->
     <main>
         <header>
-            <h1>Lista de Personal</h1>
+            <h1>Gestión de Roles</h1>
+           
         </header>
 
         <!-- HERRAMIENTAS -->
         <div class="herramientas">
-            <button id="btn-abrir-agregar" class="btn-agregar-top" title="Agregar Personal">+</button>
+            <button id="btn-abrir-agregar" class="btn-agregar-top" title="Agregar Rol">+</button>
 
             <label class="lbl-mostrar-inactivos" style="display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; color: #555; user-select: none; margin-left: 10px; margin-right: 10px;">
                 <input type="checkbox" id="chk-mostrar-inactivos" style="cursor: pointer;">
@@ -48,32 +49,31 @@
             </label>
 
             <div class="input-busqueda">
-                🔍 <input type="text" id="input-buscar-personal" placeholder="Buscar por nombre...">
+                🔍 <input type="text" id="input-buscar-rol" placeholder="Buscar rol...">
             </div>
         </div>
 
-        <!-- TABLA -->
+        <!-- TABLA DE ROLES -->
         <div class="tabla-container">
-            <table id="tabla-personal">
+            <table id="tabla-roles">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Nombre Completo</th>
-                        <th>Usuario</th>
-                        <th>Teléfono</th>
-                        <th>Rol</th>
+                        <th>ID</th>
+                        <th>Nombre del Rol</th>
+                        <th>Descripción</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="tabla-personal-body">
+                <tbody id="tabla-roles-body">
                     <tr>
-                        <td colspan="7" style="text-align: center;">Cargando personal...</td>
+                        <td colspan="5" style="text-align: center;">Cargando roles...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
+        <!-- PAGINACIÓN -->
         <div class="paginacion">
             <button id="btn-prev" disabled>Anterior</button>
             <span id="info-pagina">Página 1 de 1</span>
@@ -81,55 +81,41 @@
         </div>
     </main>
 
-    <!-- MODAL AGREGAR/EDITAR PERSONAL -->
-    <div class="modal-overlay" id="modal-personal" style="display: none;">
+    <!-- MODAL AGREGAR/EDITAR ROL -->
+    <div class="modal-overlay" id="modal-rol" style="display: none;">
         <div class="modal-content">
             <div class="modal-header-estandar">
-                <h3 id="modal-titulo-personal">👥 Registrar Nuevo Personal</h3>
+                <h3 id="modal-titulo-rol">🔐 Registrar Nuevo Rol</h3>
             </div>
             <div class="modal-body">
-                <form id="form-personal">
-                    <input type="hidden" id="usuario-id" value="">
+                <form id="form-rol">
+                    <input type="hidden" id="rol-id" value="">
 
                     <div class="campo">
-                        <label>Nombre Completo:</label>
-                        <input type="text" id="per-nombre" placeholder="Ej: Juan Pérez" required>
-                    </div>
-
-                    <div class="campo">
-                        <label>Nombre de Usuario (Login):</label>
-                        <input type="text" id="per-usuario" placeholder="Ej: juan.perez" required>
+                        <label>Nombre del Rol:</label>
+                        <input type="text" id="rol-nombre" placeholder="Ej: Administrador, Mesero, Cajero" required>
                     </div>
 
                     <div class="campo">
-                        <label>Teléfono:</label>
-                        <input type="text" id="per-telefono" placeholder="Ej: 8888-8888">
+                        <label>Descripción:</label>
+                        <textarea id="rol-descripcion" rows="3" placeholder="Describe los permisos y responsabilidades de este rol..."></textarea>
                     </div>
 
-                    <div class="campo" id="campo-password">
-                        <label>Contraseña:</label>
-                        <input type="password" id="per-pass" placeholder="********">
-                        <small style="color: #666; font-size: 12px;" id="pass-help">Mínimo 6 caracteres</small>
-                    </div>
-
-                    <div class="campo">
-                        <label>Asignar Rol:</label>
-                        <select id="per-rol" required>
-                            <option value="">-- Seleccione un Rol --</option>
-                        </select>
-                    </div>
-
-                    <div class="campo" id="campo-estado" style="display: none;">
+                    <div class="campo" id="campo-estado-rol" style="display: none;">
                         <label>Estado:</label>
-                        <select id="per-estado">
+                        <select id="rol-estado">
                             <option value="true">Activo</option>
                             <option value="false">Inactivo</option>
                         </select>
                     </div>
 
+                    <div class="info-ayuda">
+                        <small>💡 Los roles activos podrán ser asignados al personal del restaurante.</small>
+                    </div>
+
                     <div class="botones-acciones">
                         <button type="button" class="btn-salir" id="btn-cancelar">Cancelar</button>
-                        <button type="submit" class="btn-guardar" id="btn-guardar-personal">Guardar Personal</button>
+                        <button type="submit" class="btn-guardar" id="btn-guardar-rol">Guardar Rol</button>
                     </div>
                 </form>
             </div>
@@ -137,6 +123,6 @@
     </div>
 
     <script type="module" src="../../shared/utils/menu.js"></script>
-    <script type="module" src="./personal.js"></script>
+    <script type="module" src="./Roles.js"></script>
 </body>
 </html>

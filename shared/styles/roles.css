@@ -1,14 +1,24 @@
 /* ============================================================
-   MÓDULO DE PERSONAL - ESTILOS UNIFICADOS
+   MÓDULO DE ROLES - ESTILOS UNIFICADOS
    ============================================================ */
 
-/* Ajustes del contenedor principal */
 main {
     padding: 20px;
     overflow-x: auto;
 }
 
-/* Contenedor de la tabla con scroll responsive */
+header h1 {
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.subtitulo {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 0.9rem;
+}
+
+/* Contenedor de tabla */
 .tabla-container {
     overflow-x: auto;
     border-radius: 10px;
@@ -20,7 +30,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     background: white;
-    min-width: 600px;
+    min-width: 550px;
 }
 
 thead {
@@ -37,16 +47,23 @@ thead th {
 tbody td {
     padding: 12px 15px;
     border-bottom: 1px solid #eee;
+    vertical-align: middle;
 }
 
-/* Efecto cebra */
 tbody tr:nth-child(even) {
     background-color: #f9fafb;
 }
 
-/* Efecto hover */
 tbody tr:hover {
     background-color: #f3f4f6;
+}
+
+/* Descripción con límite */
+.descripcion-cell {
+    max-width: 300px;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.4;
 }
 
 /* Badge de estado */
@@ -73,7 +90,16 @@ tbody tr:hover {
 
 /* Botones de acción estilizados por shared.css */
 
-/* Botón Agregar (+) */
+/* Herramientas */
+.herramientas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
 .btn-agregar-top {
     background-color: #0e0e0e;
     color: white;
@@ -89,16 +115,6 @@ tbody tr:hover {
 .btn-agregar-top:hover {
     background-color: #333;
     transform: scale(1.05);
-}
-
-/* Herramientas */
-.herramientas {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-    gap: 15px;
 }
 
 /* Buscador */
@@ -159,7 +175,7 @@ tbody tr:hover {
 }
 
 /* ============================================================
-   MODALES (Basados en el estándar de mesas.css)
+   MODALES (Estándar unificado)
    ============================================================ */
 
 .modal-overlay {
@@ -226,7 +242,8 @@ tbody tr:hover {
 }
 
 .campo input,
-.campo select {
+.campo select,
+.campo textarea {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid #ddd;
@@ -235,17 +252,32 @@ tbody tr:hover {
     font-size: 14px;
     transition: all 0.2s ease;
     box-sizing: border-box;
+    font-family: inherit;
+}
+
+.campo textarea {
+    resize: vertical;
+    min-height: 80px;
 }
 
 .campo input:focus,
-.campo select:focus {
+.campo select:focus,
+.campo textarea:focus {
     border-color: #ff6b00;
     box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
 }
 
-.campo small {
-    display: block;
-    margin-top: 5px;
+.info-ayuda {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 3px solid #ff6b00;
+}
+
+.info-ayuda small {
+    color: #666;
+    font-size: 12px;
 }
 
 /* Botones del modal */
@@ -312,5 +344,9 @@ tbody tr:hover {
     
     .botones-acciones button {
         width: 100%;
+    }
+    
+    .descripcion-cell {
+        max-width: 200px;
     }
 }

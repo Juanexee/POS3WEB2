@@ -1,5 +1,6 @@
 // pages/login/login.js
-// Usamos 'import' para traer la lógica especializada desde la carpeta shared
+
+
 import { login, guardarSesion } from '../../shared/services/authService.js';
 
 document.getElementById('form-login').addEventListener('submit', handleLoginSubmit);
@@ -11,20 +12,31 @@ async function handleLoginSubmit(event) {
     const nombreUsuario = formData.get('nombreUsuario');
     const password = formData.get('password');
 
+    // Mostrar loading
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ Ingresando...';
+    submitBtn.disabled = true;
+
     try {
-        // Llamamos al servicio de forma limpia
+        console.log('Intentando login con:', nombreUsuario);
+        
         const data = await login(nombreUsuario, password);
         
-        // Si la API responde con éxito, guardamos los datos en el LocalStorage
+        console.log('Respuesta del servidor:', data);
+        
         if (data.token) {
             guardarSesion(data.token, nombreUsuario);
+            alert('¡Bienvenido a El Rancho de la Mimi!');
+            window.location.href = "../admin/inicio.html";
+        } else {
+            throw new Error('No se recibió token de autenticación');
         }
-
-        alert('¡Bienvenido a El Rancho de la Mimi!');
-        window.location.href = "../admin/inicio.html"; // Redirige al dashboard
-
+        
     } catch (error) {
         console.error('Error en controlador de login:', error);
-        alert(error.message); // Muestra el mensaje exacto controlado en el servicio
+        alert(error.message);
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     }
 }
